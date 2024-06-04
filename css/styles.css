@@ -1,0 +1,304 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    background-color: transparent;
+    padding: 10px 20px;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+}
+
+header .logo img {
+    height: 50px;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 80px auto 20px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.summary-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.summary-item {
+    flex: 1;
+    margin: 0 10px;
+    padding: 20px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    text-align: center;
+}
+
+.summary-item h2 {
+    margin-bottom: 10px;
+    font-size: 18px;
+    color: #333;
+}
+
+.summary-item div {
+    font-size: 24px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.content {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.calculator {
+    flex: 1;
+    min-width: 300px;
+    margin-right: 20px;
+    padding: 20px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+.calculator h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.calculator label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+.calculator .input-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.calculator .input-container span {
+    padding: 10px;
+    background: #ddd;
+    border: 1px solid #ddd;
+    border-right: none;
+    border-radius: 4px 0 0 4px;
+    font-size: 14px;
+}
+
+.calculator input[type="number"] {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 0 4px 4px 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    height: 42px;
+}
+
+.calculator .input-container.small-input input[type="number"] {
+    flex: none;
+    width: calc(100% - 70px);
+}
+
+.input-container {
+    margin-bottom: 20px;
+}
+
+.input-container label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+.input-container input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+}
+
+.input-toggle-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.input-toggle-container .input-container {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.input-toggle-container .toggle-buttons {
+    display: flex;
+    align-items: center;
+}
+
+.input-toggle-container .toggle-buttons button {
+    margin: 0;
+    border: 1px solid #ddd;
+    padding: 9px 15px;
+    cursor: pointer;
+    background-color: #f9f9f9;
+    color: #333;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.input-toggle-container .toggle-buttons button:first-child {
+    border-right: none;
+    border-radius: 4px 0 0 4px;
+}
+
+.input-toggle-container .toggle-buttons button:last-child {
+    border-radius: 0 4px 4px 0;
+}
+
+.input-toggle-container .toggle-buttons button.active {
+    background-color: #007bff;
+    color: #fff;
+    border-color: #007bff;
+}
+
+.input-toggle-container .toggle-buttons button:hover {
+    background-color: #e0e0e0;
+}
+
+.slider-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.slider {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.slider-container span {
+    font-weight: bold;
+    color: #333;
+}
+
+.chart-container {
+    flex: 2;
+    min-width: 500px;
+    padding: 20px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    height: 600px; /* Adjust the height as needed */
+}
+
+.result {
+    margin-top: 20px;
+}
+
+.result-item {
+    margin-bottom: 10px;
+    font-size: 16px;
+    color: #333;
+    font-family: 'Poppins', sans-serif;
+}
+
+.result-item strong {
+    font-weight: bold;
+    color: #000;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    color: #333;
+}
+
+td {
+    background-color: #fff;
+    color: #333;
+}
+
+tr:nth-child(even) td {
+    background-color: #f9f9f9;
+}
+
+tr:hover td {
+    background-color: #f1f1f1;
+}
+
+.input-container {
+    margin-bottom: 20px;
+}
+
+.input-container label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+.input-container input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+}
+
+/* Add this CSS to your stylesheet */
+.input-container.wider-input {
+    display: flex;
+    align-items: center;
+    width: 250px; /* Adjust the width as needed */
+}
+
+.input-container.wider-input input {
+    flex: 1;
+    padding: 5px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+

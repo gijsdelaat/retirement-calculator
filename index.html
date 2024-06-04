@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pensioensparen Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="node_modules/chart.js/dist/chart.umd.js"></script>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="https://cdn.shopify.com/s/files/1/0777/8487/5353/files/Add_a_heading-removebg-preview.png?v=1716813609" alt="Logo">
+        </div>
+    </header>
+    <div class="container">
+        <div class="summary-container">
+            <div class="summary-item">
+                <h2>Benodigd Spaargeld</h2>
+                <div id="requiredAmount"></div>
+            </div>
+            <div class="summary-item">
+                <h2>Gespaard Spaargeld</h2>
+                <div id="savedAmount"></div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="calculator">
+                <h1>Pensioensparen Calculator</h1>
+                <label for="startAmount">Startbedrag:</label>
+                <div class="input-container">
+                    <span>€</span>
+                    <input type="number" id="startAmount" value="15000" step="1000">
+                </div>
+
+                <label for="annualContribution">Bijdrage:</label>
+                <div class="input-toggle-container">
+                    <div class="input-container small-input">
+                        <span>€</span>
+                        <input type="number" id="annualContribution" value="18000" step="500">
+                    </div>
+                    <div class="toggle-buttons">
+                        <button id="annualToggle" class="active" onclick="toggleFrequency(this, 'contribution')">Jaarlijks</button>
+                        <button id="monthlyToggle" onclick="toggleFrequency(this, 'contribution')">Maandelijks</button>
+                    </div>
+                </div>
+
+                <label for="annualReturn">Jaarlijks rendement (%):</label>
+                <div class="slider-container">
+                    <input type="range" id="annualReturn" min="0" max="20" step="1" value="8" class="slider">
+                    <span id="annualReturnDisplay">8%</span>
+                </div>
+
+                <label for="postRetirementReturn">Rendement na pensioen (%):</label>
+                <div class="slider-container">
+                    <input type="range" id="postRetirementReturn" min="0" max="20" step="1" value="7" class="slider">
+                    <span id="postRetirementReturnDisplay">7%</span>
+                </div>
+
+                 <!-- Huidige leeftijd slider -->
+        <label for="age">Huidige leeftijd:</label>
+        <div class="slider-container">
+            <input type="range" id="age" min="18" max="50" step="1" value="30" class="slider">
+            <span id="ageDisplay">30</span>
+        </div>
+
+        <!-- Gewenste pensioenleeftijd slider -->
+        <label for="retirementAge">Gewenste pensioenleeftijd:</label>
+        <div class="slider-container">
+            <input type="range" id="retirementAge" min="55" max="70" step="1" value="65" class="slider">
+            <span id="retirementAgeDisplay">65</span>
+        </div>
+
+        <!-- Verwachte levensduur slider -->
+        <label for="lifeExpectancy">Verwachte levensduur:</label>
+        <div class="slider-container">
+            <input type="range" id="lifeExpectancy" min="70" max="100" step="1" value="95" class="slider">
+            <span id="lifeExpectancyDisplay">95</span>
+        </div>
+
+       
+        <!-- Inkomen na pensioen input -->
+        <label for="annualSalaryAfterRetirement">Salaris na Pensioen:</label>
+        <div class="input-toggle-container">
+            <div class="input-container small-input">
+                <span>€</span>
+                <input type="number" id="annualSalaryAfterRetirement" value="80000" step="500">
+            </div>
+            <div class="toggle-buttons">
+                <button id="annualSalaryToggle" class="active" onclick="toggleFrequency(this, 'salary')">Jaarlijks</button>
+                <button id="monthlySalaryToggle" onclick="toggleFrequency(this, 'salary')">Maandelijks</button>
+            </div>
+        </div>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="savingsChart"></canvas>
+        
+                <h2>Overzicht</h2>
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>Leeftijd</th>
+                            <th>Spaargeld (€)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dynamische data komt hier -->
+                    </tbody>
+                </table>
+            </div>
+        </div> <!-- Close .content -->
+    </div> <!-- Close .container -->
+    <script src="js/script.js"></script>
+</body>
+</html>
+
