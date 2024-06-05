@@ -1,4 +1,4 @@
-let chart; // Declare a global variable to hold the chart instance
+    let chart; // Declare a global variable to hold the chart instance
 let contributionFrequency = 'annual';
 let salaryFrequency = 'annual';
 let incomeType = 'gross';
@@ -82,6 +82,7 @@ function berekenPensioensparen() {
     const leeftijd = parseFloat(document.getElementById('age').value) || 0;
     const levensverwachting = parseFloat(document.getElementById('lifeExpectancy').value) || lifeExpectancy;
     const inkomen = parseFloat(document.getElementById('annualSalaryAfterRetirement').value) || 0;
+    const heeftFiscaalPartner = document.getElementById('fiscalPartner').checked;
 
     // Convert to yearly if monthly
     const jaarlijkseBijdrage = contributionFrequency === 'monthly' ? bijdrage * 12 : bijdrage;
@@ -95,40 +96,49 @@ function berekenPensioensparen() {
     // Bereken spaargeld tot pensioen
     let spaargeldTotPensioen = initieleInleg;
     let spaargeldData = [];
+    const vermogensvrijstelling = heeftFiscaalPartner ? 114000 : 57000;
+
     for (let i = 0; i < jarenTotPensioen; i++) {
         spaargeldTotPensioen += jaarlijkseBijdrage;
-        spaargeldTotPensioen *= (1 + jaarlijksRendement);
-        spaargeldData.push({ leeftijd: leeftijd + i, spaargeld: Math.max(spaargeldTotPensioen, 0).toFixed(0) });
+        const rendement = spaargeldTotPensioen * jaarlijksRendement;
+        spaargeldTotPensioen += rendement;
+
+        // Apply tax on the savings
+        const belastbaarVermogen = Math.max(spaargeldTotPensioen - vermogensvrijstelling, 0);
+        const rendementSpaargeld = belastbaarVermogen * 0.0092; // 0.92% voor spaargeld
+        const rendementBeleggingen = belastbaarVermogen * 0.0617; // 6.17% voor beleggingen
+        const totaalRendement = rendementSpaargeld + rendementBeleggingen;
+        const belasting = totaalRendement * 0.36; // 36% belastingtarief voor 2024
+
+        spaargeldTotPensioen -= belasting;
+        spaargeldData.push({ leeftijd: leeftijd + i, spaargeld: Math.max(spaargeldTotPensioen, 0).toFixed(0), rendement: rendement.toFixed(0), belasting: belasting.toFixed(0) });
     }
 
     // Bereken spaargeld tijdens pensioen
     for (let i = 0; i < pensioenJaren; i++) {
         const jaarInkomenNaPensioen = pensioenLeeftijd + i >= 67 ? jaarlijksInkomen - 1047 * 12 : jaarlijksInkomen;
         spaargeldTotPensioen -= jaarInkomenNaPensioen;
-        spaargeldTotPensioen *= (1 + rendementNaPensioen);
-        spaargeldTotPensioen = Math.max(spaargeldTotPensioen, 0); // Ensure it doesn't go below 0
-        spaargeldTotPensioen = Math.max(spaargeldTotPensioen, 0); // Ensure it doesn't go below 0
-        spaargeldTotPensioen = Math.max(spaargeldTotPensioen, 0); // Ensure it doesn't go below 0
-        spaargeldData.push({ leeftijd: pensioenLeeftijd + i, spaargeld: spaargeldTotPensioen.toFixed(0) });
-    }
+        const rendement = spaargeldTotPensioen * rendementNaPensioen;
+        spaargeldTotPensioen += rendement;
 
-    // Bereken het benodigde spaargeld bij pensioenleeftijd
-    let benodigdSpaargeld = 0;
-    for (let i = 0; i < pensioenJaren; i++) {
-        const jaarInkomenNaPensioen = pensioenLeeftijd + i >= 67 ? jaarlijksInkomen - 1047 * 12 : jaarlijksInkomen;
-        benodigdSpaargeld += jaarInkomenNaPensioen / Math.pow(1 + rendementNaPensioen, i + 1);
-    }
+        // Apply tax on the savings
+        const belastbaarVermogen = Math.max(spaargeldTotPensioen - vermogensvrijstelling, 0);
+        const rendementSpaargeld = belastbaarVermogen * 0.0092; // 0.92% voor spaargeld
+        const rendementBeleggingen = belastbaarVermogen * 0.0617; // 6.17% voor beleggingen
+        const totaalRendement = rendementSpaargeld + rendementBeleggingen;
+        const belasting = totaalRendement * 0.36; // 36% belastingtarief voor 2024
 
-    // Toon het overzicht
-    document.getElementById('requiredAmount').innerHTML = formatCurrency(benodigdSpaargeld);
-    document.getElementById('savedAmount').innerHTML = formatCurrency(parseFloat(spaargeldData[jarenTotPensioen - 1].spaargeld));
+        spaargeldTotPensioen -= belasting;
+        spaargeldTotPensioen = Math.max(spaargeldTotPensioen, 0); // Ensure it doesn't go below 0
+        spaargeldData.push({ leeftijd: pensioenLeeftijd + i, spaargeld: spaargeldTotPensioen.toFixed(0), rendement: rendement.toFixed(0), belasting: belasting.toFixed(0) });
+    }
 
     // Update de tabel
     const dataTableBody = document.getElementById('dataTable').querySelector('tbody');
     dataTableBody.innerHTML = '';
     spaargeldData.forEach(data => {
         const row = document.createElement('tr');
-        row.innerHTML = `<td>${data.leeftijd}</td><td>${formatCurrency(parseFloat(data.spaargeld))}</td>`;
+        row.innerHTML = `<td>${data.leeftijd}</td><td>${formatCurrency(parseFloat(data.spaargeld))}</td><td>${formatCurrency(parseFloat(data.rendement))}</td><td>${formatCurrency(parseFloat(data.belasting))}</td>`;
         dataTableBody.appendChild(row);
     });
 
@@ -176,44 +186,6 @@ function berekenPensioensparen() {
                         label: function (context) {
                             return `${context.dataset.label}: ${formatCurrency(context.raw)}`;
                         }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'bottom',
-                        align: 'end',
-                        labels: {
-                            color: '#333',
-                            font: {
-                                size: 14,
-                                family: 'Poppins', 
-                                weight: 'bold'
-                            }
-                        }
-                    },
-                    tooltip: {
-                        enabled: true,
-                        mode: 'nearest',
-                        intersect: false,
-                        callbacks: {
-                            label: function (context) {
-                                return `Value: ${formatNumber(context.raw)}`;
-                            }
-                        },
-                        backgroundColor: '#333', // Background color
-                        titleFontFamily: 'Poppins', // Font family for the title
-                        titleFontSize: 18, // Font size for the title
-                        titleFontColor: '#fff', // Font color for the title
-                        bodyFontFamily: 'Poppins', // Font family for the body
-                        bodyFontSize: 16, // Font size for the body
-                        bodyFontColor: '#fff', // Font color for the body
-                        displayColors: false, // Disable the color box
-                        xPadding: 15, // Padding on the x-axis
-                        yPadding: 15, // Padding on the y-axis
-                        borderColor: '#007bff', // Border color
-                        borderWidth: 1, // Border width
-                        cornerRadius: 4 // Border radius
                     }
                 },
                 scales: {
@@ -264,6 +236,48 @@ function berekenPensioensparen() {
                             display: true // Enable horizontal grid lines
                         },
                         min: 0 // Ensure the y-axis starts at 0
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        align: 'end',
+                        labels: {
+                            color: '#333',
+                            font: {
+                                size: 14,
+                                family: 'Poppins',
+                                weight: 'bold'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        enabled: true,
+                        mode: 'nearest',
+                        intersect: false,
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleFont: {
+                            size: 16,
+                            family: 'Poppins',
+                            weight: 'bold',
+                            color: '#fff'
+                        },
+                        bodyFont: {
+                            size: 14,
+                            family: 'Poppins',
+                            weight: 'normal',
+                            color: '#fff'
+                        },
+                        footerFont: {
+                            size: 12,
+                            family: 'Poppins',
+                            weight: 'normal',
+                            color: '#fff'
+                        },
+                        padding: 10,
+                        cornerRadius: 6,
+                        displayColors: false
                     }
                 }
             }
@@ -331,3 +345,11 @@ document.getElementById('lifeExpectancy').addEventListener('input', () => {
 });
 
 // Add similar event listeners for other input elements if needed
+
+// Add event listener for fiscal partner checkbox
+document.getElementById('fiscalPartner').addEventListener('change', () => {
+    berekenPensioensparen();
+});
+
+
+

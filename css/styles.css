@@ -9,19 +9,50 @@ body {
 }
 
 header {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    background-color: transparent;
-    padding: 10px 20px;
+    background-color: #f8f9fa;
     position: fixed;
-    width: 100%;
     top: 0;
     left: 0;
+    right: 0;
+    z-index: 1000;
+    padding: 0px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 header .logo img {
-    height: 50px;
+    height: 60px;
+}
+
+header nav ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+    margin: 0;
+    padding: 0;
+}
+
+header nav ul li {
+    display: inline;
+}
+
+header nav ul li a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 600;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+}
+
+header nav ul li a i {
+    margin-right: 8px;
+}
+
+header nav ul li a:hover {
+    color: #007bff;
 }
 
 .container {
@@ -213,7 +244,7 @@ header .logo img {
     border: 2px solid #ddd;
     border-radius: 8px;
     background-color: #f9f9f9;
-    height: 600px; /* Adjust the height as needed */
+    min-height: 600px; /* Flexible height starting from 600px */
 }
 
 .result {
@@ -301,4 +332,43 @@ tr:hover td {
     border: 1px solid #ccc;
     border-radius: 4px;
 }
+
+.tooltip {
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+    color: #007bff;
+    margin-left: 5px;
+    font-size: 0.8em; /* Kleinere lettergrootte */
+}
+
+.tooltip::after {
+    content: attr(title);
+    position: absolute;
+    left: 50%;
+    bottom: 125%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 5px;
+    border-radius: 5px;
+    white-space: normal; /* Tekstomloop */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s;
+    z-index: 1;
+    font-size: 0.8em; /* Kleinere lettergrootte */
+    width: 200px; /* Redelijke breedte */
+    text-align: center; /* Tekst centreren */
+}
+
+.tooltip:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+input[type="checkbox"] {
+    margin-left: 10px;
+}
+
 
