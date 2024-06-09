@@ -70,7 +70,6 @@ body {
 .sum-line {
     border-top: 2px solid #000;
 }
-
 header {
     background-color: #f8f9fa;
     position: fixed;
@@ -80,7 +79,7 @@ header {
     z-index: 1000;
     padding: 0px 20px;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; /* Keeps logo on the left and nav aligned left top */
     align-items: center;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -89,10 +88,17 @@ header .logo img {
     height: 60px;
 }
 
+header nav {
+    flex: 1; /* Allows the nav to take up the remaining space */
+    display: flex;
+    justify-content: flex-start; /* Aligns nav items to the left */
+    margin-left: 40px; /* Adds more space between the logo and nav items */
+}
+
 header nav ul {
     list-style: none;
     display: flex;
-    gap: 20px;
+    gap: 40px; /* Increased spacing between items */
     margin: 0;
     padding: 0;
 }
@@ -105,7 +111,7 @@ header nav ul li a {
     text-decoration: none;
     color: #333;
     font-weight: 600;
-    font-size: 16px;
+    font-size: 18px; /* Increased font size */
     display: flex;
     align-items: center;
 }
@@ -114,13 +120,13 @@ header nav ul li a i {
     margin-right: 8px;
 }
 
-header nav ul li a:hover {
-    color: #007bff;
+header nav ul li a.active {
+    color: #007bff; /* White text for better readability */
 }
 
 .container {
     width: 100%; /* Ensure full width */
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 80px auto 20px;
     padding: 20px;
     background-color: #fff;
@@ -314,7 +320,7 @@ header nav ul li a:hover {
 
 .chart-container {
     flex: 2;
-    min-width: 790px;
+    min-width: 900px;
     padding: 20px;
     border: 2px solid #ddd;
     border-radius: 8px;
@@ -663,3 +669,17 @@ button:hover {
     margin-bottom: 5px;
 }
 
+.estimated-withdrawal-container {
+    margin: 20px auto;
+    padding: 15px;
+    background-color: #f2f2f2;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    text-align: center;
+    width: 80%; /* Adjust width as necessary */
+}
+
+.estimated-withdrawal-container h2 {
+    color: #333;
+
+}

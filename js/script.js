@@ -65,7 +65,7 @@ function berekenBox3Sparen() {
                 labels: labels,
                 datasets: [
                     {
-                        label: 'Box 3 Sparen',
+                        label: 'Spaargeld',
                         data: spaargeldData,
                         borderColor: 'rgba(75, 192, 192, 1)',
                         backgroundColor: 'rgba(75, 192, 192, 0.2)',

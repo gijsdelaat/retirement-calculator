@@ -18,10 +18,9 @@
         <nav>
             <ul>
                 <li><a href="index.html"><i class="fas fa-piggy-bank"></i> Box 3 Sparen</a></li>
-                <li><a href="pensioensparen.html"><i class="fas fa-chart-line"></i> Pensioensparen</a></li>
-                <li><a href="#"><i class="fas fa-car"></i> Auto Lease Vs. Koop</a></li>
+                <li><a href="pensioensparen.html" class="active"><i class="fas fa-chart-line"></i> Pensioensparen</a></li>
                 <li><a href="bruto_netto.html"><i class="fas fa-exchange-alt"></i> Netto/Bruto Salaris Omrekenen</a></li>
-                <li><a href="#"><i class="fas fa-lightbulb"></i> Belastingtips</a></li>
+
             </ul>
         </nav>
     </header>
@@ -29,27 +28,28 @@
         <div class="content">
             <div class="calculator">
                 <h1>Pensioensparen</h1>
+                <label for="startAmount">Startbedrag: <span class="tooltip" title="Het bedrag waarmee je begint te sparen. Bijvoorbeeld, als je al €15.000 hebt gespaard, vul je hier €15.000 in.">ℹ️</span></label>
+                <div class="input-container">
+                    <span>€</span>
+                    <input type="number" id="startAmount" value="5000" step="500">
+                </div>
                 <label for="grossIncome">Bruto Inkomen: <span class="tooltip" title="Het bedrag dat je jaarlijks of maandelijks verdient. Bijvoorbeeld, als je elk jaar €40.000 verdient, vul je hier €40.000 in.">ℹ️</span></label>
                 <div class="input-toggle-container">
                     <div class="input-container small-input">
                         <span>€</span>
-                        <input type="number" id="grossIncome" value="40000" step="1000">
+                        <input type="number" id="grossIncome" value="30000" step="500">
                     </div>
                     <div class="toggle-buttons">
                         <button id="annualIncomeToggle" class="active" onclick="toggleFrequency(this, 'income')">Jaarlijks</button>
                         <button id="monthlyIncomeToggle" onclick="toggleFrequency(this, 'income')">Maandelijks</button>
                     </div>
                 </div>
-                <label for="startAmount">Startbedrag: <span class="tooltip" title="Het bedrag waarmee je begint te sparen. Bijvoorbeeld, als je al €15.000 hebt gespaard, vul je hier €15.000 in.">ℹ️</span></label>
-                <div class="input-container">
-                    <span>€</span>
-                    <input type="number" id="startAmount" value="15000" step="1000">
-                </div>
+                
                 <label for="annualContribution">Bijdrage: <span class="tooltip" title="Het bedrag dat je jaarlijks of maandelijks bijdraagt aan je pensioen. Bijvoorbeeld, als je elk jaar €18.000 bijdraagt, vul je hier €18.000 in.">ℹ️</span></label>
                 <div class="input-toggle-container">
                     <div class="input-container small-input">
                         <span>€</span>
-                        <input type="number" id="annualContribution" value="18000" step="500">
+                        <input type="number" id="annualContribution" value="2500" step="500">
                     </div>
                     <div class="toggle-buttons">
                         <button id="annualToggle" class="active" onclick="toggleFrequency(this, 'contribution')">Jaarlijks</button>
@@ -58,13 +58,13 @@
                 </div>
                 <label for="annualReturn">Jaarlijks rendement (%): <span class="tooltip" title="Het percentage rendement dat je jaarlijks verwacht te behalen op je pensioen/spaargeld.">ℹ️</span></label>
                 <div class="slider-container">
-                    <input type="range" id="annualReturn" min="0" max="20" step="1" value="8" class="slider">
-                    <span id="annualReturnDisplay">8%</span>
+                    <input type="range" id="annualReturn" min="0" max="10" step="1" value="7" class="slider">
+                    <span id="annualReturnDisplay">7%</span>
                 </div>
                 <label for="postRetirementReturn">Rendement na pensioen (%): <span class="tooltip" title="Het percentage rendement dat je verwacht te behalen op je spaargeld na je pensioen. ">ℹ️</span></label>
                 <div class="slider-container">
-                    <input type="range" id="postRetirementReturn" min="0" max="20" step="1" value="7" class="slider">
-                    <span id="postRetirementReturnDisplay">7%</span>
+                    <input type="range" id="postRetirementReturn" min="0" max="7" step="1" value="3" class="slider">
+                    <span id="postRetirementReturnDisplay">3%</span>
                 </div>
                 <label for="age">Huidige leeftijd:</label>
                 <div class="slider-container">
@@ -83,30 +83,13 @@
                 </div>
                 <label for="fiscalPartner">Fiscaal partner: <span class="tooltip" title="Vink dit aan als je een fiscaal partner hebt. Dit verdubbelt de vermogensvrijstelling.">ℹ️</span></label>
                 <input type="checkbox" id="fiscalPartner">
-                <label for="annualSalaryAfterRetirement">Netto Uitkering na Pensioen: <span class="tooltip" title="Het bedrag dat je jaarlijks of maandelijks verwacht te ontvangen na je pensioen.">ℹ️</span></label>
-                <div class="input-toggle-container">
-                    <div class="input-container small-input">
-                        <span>€</span>
-                        <input type="number" id="annualSalaryAfterRetirement" value="80000" step="500">
-                    </div>
-                    <div class="toggle-buttons">
-                        <button id="annualSalaryToggle" class="active" onclick="toggleFrequency(this, 'salary')">Jaarlijks</button>
-                        <button id="monthlySalaryToggle" onclick="toggleFrequency(this, 'salary')">Maandelijks</button>
-                    </div>
-                </div>
-                <label for="lijfrenteUitkering">Lijfrente Uitkering: <span class="tooltip" title="Het bedrag dat je jaarlijks of maandelijks verwacht te ontvangen uit je lijfrente.">ℹ️</span></label>
-                <div class="input-toggle-container">
-                    <div class="input-container small-input">
-                        <span>€</span>
-                        <input type="number" id="lijfrenteUitkering" value="10000" step="500">
-                    </div>
-                    <div class="toggle-buttons">
-                        <button id="annualLijfrenteToggle" class="active" onclick="toggleFrequency(this, 'lijfrente')">Jaarlijks</button>
-                        <button id="monthlyLijfrenteToggle" onclick="toggleFrequency(this, 'lijfrente')">Maandelijks</button>
-                    </div>
-                </div>
             </div>
+            
             <div class="chart-container">
+                <div class="estimated-withdrawal-container">
+                    <h2>Geschatte Uitkering na Pensioen:</h2>
+                    <p id="estimatedWithdrawalDisplay">€0 per jaar</p>
+                </div>
                 <canvas id="pensionChartInleg"></canvas>
                 <canvas id="pensionChartBrutoInkomen"></canvas>
                 <h2>Overzicht</h2>
