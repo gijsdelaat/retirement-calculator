@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netto/Bruto Salaris Omrekenen</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="js/bruto_netto.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="logo" style="display: flex; align-items: center;">
+            <img src="https://i.ibb.co/DR1gbRK/DALL-E-2024-05-27-14-37-17-A-clean-simple-and-serious-logo-for-a-financial-planning-business-featuri.png" alt="Logo" style="height: 50px; margin-right: 10px;">
+            <h1>SpaarSlim</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html"><i class="fas fa-piggy-bank"></i> Box 3 Sparen</a></li>
+                <li><a href="pensioensparen.html"><i class="fas fa-chart-line"></i> Pensioensparen</a></li>
+                <li><a href="#"><i class="fas fa-car"></i> Auto Lease Vs. Koop</a></li>
+                <li><a href="bruto_netto.html"><i class="fas fa-exchange-alt"></i> Netto/Bruto Salaris Omrekenen</a></li>
+                <li><a href="#"><i class="fas fa-lightbulb"></i> Belastingtips</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="container">
+        <div class="content">
+            <div class="calculator">
+                <div class="header-container">
+                    <h1 id="nettoHeader" onclick="swapCalculation()">Netto</h1>
+                    <i class="fas fa-arrow-right arrow" onclick="swapCalculation()"></i>
+                    <h1 id="brutoHeader" onclick="swapCalculation()">Bruto</h1>
+                </div>
+                <label for="salary">Salaris: <span class="tooltip" title="Het salaris per maand of per jaar.">ℹ️</span></label>
+                <div class="input-container">
+                    <span>€</span>
+                    <input type="number" id="salary" value="3000" step="100" oninput="calculate()">
+                </div>
+                <div class="toggle-buttons">
+                    <button id="monthlyToggle" class="active" onclick="toggleFrequency(this, 'monthly')">Maandelijks</button>
+                    <button id="annualToggle" onclick="toggleFrequency(this, 'annual')">Jaarlijks</button>
+                </div>
+                <div class="input-group">
+                    <label for="vacationMoney">Vakantiegeld: <span class="tooltip" title="Vakantiegeld is meestal 8% van je bruto jaarsalaris.">ℹ️</span></label>
+                    <input type="checkbox" id="vacationMoney" onchange="calculate()">
+                </div>
+                <div class="input-group">
+                    <label for="thirteenthMonth">13e Maand:</label>
+                    <input type="checkbox" id="thirteenthMonth" onchange="calculate()">
+                </div>
+                <div class="input-group">
+                    <label for="age">Leeftijd:</label>
+                    <input type="number" id="age" value="30" step="1" oninput="calculate()">
+                </div>
+            </div>
+            <div class="chart-container" style="float: right;">
+                <h2>Resultaat</h2>
+                <div id="resultsTable"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
