@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="css/styles.css">
     <script src="js/bruto_netto.js" defer></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <header>
@@ -29,18 +30,18 @@
         <div class="content">
             <div class="calculator">
                 <div class="header-container">
-                    <h1 id="nettoHeader" onclick="swapCalculation()">Netto</h1>
-                    <i class="fas fa-arrow-right arrow" onclick="swapCalculation()"></i>
-                    <h1 id="brutoHeader" onclick="swapCalculation()">Bruto</h1>
+                    <h1 id="brutoHeader" onclick="swapCalculation()" onmouseover="this.style.cursor='pointer'">Bruto</h1>
+                    <i class="fas fa-exchange-alt" onclick="swapCalculation()" onmouseover="this.style.cursor='pointer'"></i>
+                    <h1 id="nettoHeader" onclick="swapCalculation()" onmouseover="this.style.cursor='pointer'">Netto</h1>
                 </div>
-                <label for="salary">Salaris: <span class="tooltip" title="Het salaris per maand of per jaar.">ℹ️</span></label>
+                <label for="salary" id="salaryLabel">Maandsalaris: <span class="tooltip" title="Voer hier je salaris per maand in.">ℹ️</span></label>
                 <div class="input-container">
                     <span>€</span>
                     <input type="number" id="salary" value="3000" step="100" oninput="calculate()">
                 </div>
                 <div class="toggle-buttons">
-                    <button id="monthlyToggle" class="active" onclick="toggleFrequency(this, 'monthly')">Maandelijks</button>
-                    <button id="annualToggle" onclick="toggleFrequency(this, 'annual')">Jaarlijks</button>
+                    <button id="monthlyToggle" class="active" onclick="toggleFrequency(this, 'monthly')">Toon Maandelijks</button>
+                    <button id="annualToggle" onclick="toggleFrequency(this, 'annual')">Toon Jaarlijks</button>
                 </div>
                 <div class="input-group">
                     <label for="vacationMoney">Vakantiegeld: <span class="tooltip" title="Vakantiegeld is meestal 8% van je bruto jaarsalaris.">ℹ️</span></label>
@@ -55,11 +56,26 @@
                     <input type="number" id="age" value="30" step="1" oninput="calculate()">
                 </div>
             </div>
-            <div class="chart-container" style="float: right;">
-                <h2>Resultaat</h2>
-                <div id="resultsTable"></div>
+            <div class="chart-container">
+                <p id="incomeSummary"></p>
+                
+                <div class="table-and-chart">
+                    <div class="results-table">
+                        <h2>Resultaat</h2>
+                        
+                        <table id="resultsTable">
+                            <!-- Table content -->
+                        </table>
+                    </div>
+                    <div class="results-chart">
+                        <canvas id="taxPieChart"></canvas>
+                    </div>
+                </div>
             </div>
+            
         </div>
     </div>
 </body>
 </html>
+
+
