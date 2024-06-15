@@ -2,91 +2,21 @@ document.addEventListener('DOMContentLoaded', (event) => {
     berekenPensioensparen();
     updateSliders();
     setupEventListeners();
-    setupBrutoInkomenChart();
 });
 
 let chartInleg;
-let chartBrutoInkomen;
-
-function setupBrutoInkomenChart() {
-    const leeftijd = parseFloat(document.getElementById('age').value) || 0;
-    const pensioenLeeftijd = parseFloat(document.getElementById('retirementAge').value) || 65;
-    const levensverwachting = parseFloat(document.getElementById('lifeExpectancy').value) || 90;
-    const brutoInkomen = parseFloat(document.getElementById('grossIncome').value) || 0;
-    const withdrawalEstimate = parseFloat(document.getElementById('estimatedWithdrawalDisplay').textContent.replace(/[^\d.-]/g, '')) || 0;
-
-    const totalYears = levensverwachting - leeftijd;
-    const jarenTotPensioen = pensioenLeeftijd - leeftijd;
-    const jarenNaPensioen = levensverwachting - pensioenLeeftijd;
-
-    const labels = Array.from({ length: totalYears }, (_, i) => leeftijd + i);
-    const brutoInkomenData = Array.from({ length: totalYears }, (_, i) => i < jarenTotPensioen ? brutoInkomen : withdrawalEstimate);
-
-    const ctxBrutoInkomen = document.getElementById('brutoInkomenChart').getContext('2d');
-    chartBrutoInkomen = new Chart(ctxBrutoInkomen, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Bruto Inkomen',
-                data: brutoInkomenData,
-                borderColor: 'rgba(54, 162, 235, 1)',
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderWidth: 2,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return '€' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-                        }
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'top'
-                }
-            }
-        }
-    });
-}
-
-function updateBrutoInkomenChart() {
-    const brutoInkomen = parseFloat(document.getElementById('grossIncome').value) || 0;
-    const withdrawalEstimate = parseFloat(document.getElementById('estimatedWithdrawalDisplay').textContent.replace(/[^\d.-]/g, '')) || 0;
-    const pensioenLeeftijd = parseFloat(document.getElementById('retirementAge').value) || 65;
-
-    // Update data by mapping over labels, not adding new data points
-    chartBrutoInkomen.data.datasets[0].data = chartBrutoInkomen.data.labels.map(label => {
-        const age = parseInt(label);
-        return age < pensioenLeeftijd ? brutoInkomen : withdrawalEstimate;
-    });
-
-    chartBrutoInkomen.update();
-}
 
 function setupEventListeners() {
     document.querySelectorAll('input').forEach(input => {
         input.addEventListener('input', () => {
             berekenPensioensparen();
             updateSliders();
-            updateBrutoInkomenChart();
-            updatePensionTable(); // Call the update function here
         });
     });
 
     document.querySelectorAll('.toggle-buttons button').forEach(button => {
         button.addEventListener('click', (event) => {
             toggleFrequency(event.target, event.target.closest('.input-toggle-container').querySelector('input').id === 'annualContribution' ? 'contribution' : 'salary');
-            updatePensionTable(); // Also update the table when toggling frequency
         });
     });
 }
@@ -140,7 +70,7 @@ function berekenPensioensparen() {
 
     let spaargeldTotPensioen = initieleInleg;
     let spaargeldData = [];
-    let totalYears = jarenTotPensioen + jarenNaPensioen;
+    let totalYears = jarenTotPensioen + jarenNaPensioen + 5; // Extend 5 years beyond life expectancy
 
     for (let i = 0; i < totalYears; i++) {
         if (i < jarenTotPensioen) {
@@ -217,35 +147,6 @@ function berekenPensioensparen() {
         });
     }
 
-    // Calculate net income
-    const brutoInkomen = parseFloat(document.getElementById('grossIncome').value) || 0;
-    const nettoInkomen = calculateNetIncome(brutoInkomen); // Assuming you have a function to calculate net income
-    const brutoInkomenNaPensioen = withdrawalEstimate;
-    const nettoInkomenNaPensioen = calculateNetIncome(brutoInkomenNaPensioen); // Assuming you have a function to calculate net income
-    const belastingBespaardBruto = brutoInkomen - brutoInkomenNaPensioen;
-    const belastingBespaardNetto = nettoInkomen - nettoInkomenNaPensioen;
-
-    // Update the new table
-    const newTableBody = document.getElementById('incomeDataTable').querySelector('tbody');
-    newTableBody.innerHTML = ''; // Clear existing rows
-    const rowBruto = document.createElement('tr');
-    rowBruto.innerHTML = `
-        <td>Bruto</td>
-        <td>€${brutoInkomen.toFixed(2)}</td>
-        <td>€${brutoInkomenNaPensioen.toFixed(2)}</td>
-        <td>€${belastingBespaardBruto.toFixed(2)}</td>
-    `;
-    newTableBody.appendChild(rowBruto);
-
-    const rowNetto = document.createElement('tr');
-    rowNetto.innerHTML = `
-        <td>Netto</td>
-        <td>€${nettoInkomen.toFixed(2)}</td>
-        <td>€${nettoInkomenNaPensioen.toFixed(2)}</td>
-        <td>€${belastingBespaardNetto.toFixed(2)}</td>
-    `;
-    newTableBody.appendChild(rowNetto);
-
     // Update the table
     const dataTableBody = document.getElementById('pensionDataTable').querySelector('tbody');
     dataTableBody.innerHTML = ''; // Clear existing rows
@@ -276,16 +177,3 @@ function toggleFrequency(button, type) {
     }
     berekenPensioensparen();
 }
-
-function updatePensionTable() {
-    const brutoInkomen = parseFloat(document.getElementById('grossIncome').value) || 0;
-    const withdrawalEstimate = parseFloat(document.getElementById('estimatedWithdrawalDisplay').textContent.replace(/[^\d.-]/g, '')) || 0;
-
-    // Assuming the table has specific rows for displaying these values
-    document.getElementById('tableGrossIncome').textContent = `€${brutoInkomen.toFixed(2)}`;
-    document.getElementById('tableWithdrawalEstimate').textContent = `€${withdrawalEstimate.toFixed(2)}`;
-}
-
-
-
-

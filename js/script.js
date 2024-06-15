@@ -34,13 +34,19 @@ function berekenBox3Sparen() {
     let spaargeld = initieleInleg;
     let spaargeldData = [];
     let belastingData = [];
+    let cumulativeContributions = initieleInleg;
+    let contributionsData = [];
+    let rendementData = [];
     const taxFreeAllowance = heeftFiscaalPartner ? 114000 : 57000;
     const taxRate = 0.32;
 
     for (let i = 0; i < spaarduur; i++) {
         spaargeld += jaarlijkseBijdrage;
+        cumulativeContributions += jaarlijkseBijdrage;
         spaargeld *= (1 + jaarlijksRendement);
         spaargeldData.push(spaargeld.toFixed(0));
+        contributionsData.push(cumulativeContributions.toFixed(0));
+        rendementData.push((spaargeld - cumulativeContributions).toFixed(0));
 
         // Calculate Box 3 Belasting
         const taxableAmount = Math.max(spaargeld - taxFreeAllowance, 0);
@@ -56,6 +62,8 @@ function berekenBox3Sparen() {
     if (chart) {
         chart.data.labels = labels;
         chart.data.datasets[0].data = spaargeldData;
+        chart.data.datasets[1].data = contributionsData;
+        chart.data.datasets[2].data = rendementData;
         chart.update();
     } else {
         const ctx = document.getElementById('savingsChart').getContext('2d');
@@ -74,6 +82,22 @@ function berekenBox3Sparen() {
                         pointBorderColor: '#fff',
                         pointHoverBackgroundColor: '#fff',
                         pointHoverBorderColor: 'rgba(75, 192, 192, 1)',
+                        fill: true,
+                        tension: 0.4,
+                        spanGaps: true,
+                        pointRadius: 0,
+                        pointHoverRadius: 5
+                    },
+                    {
+                        label: 'Eigen Inleg',
+                        data: contributionsData,
+                        borderColor: 'rgba(75, 192, 75, 1)',
+                        backgroundColor: 'rgba(75, 192, 75, 0.2)',
+                        borderWidth: 3,
+                        pointBackgroundColor: 'rgba(75, 192, 75, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(75, 192, 75, 1)',
                         fill: true,
                         tension: 0.4,
                         spanGaps: true,
@@ -112,6 +136,9 @@ function berekenBox3Sparen() {
         });
     }
 
+    // Update the pension data table
+    const pensionDataTableBody = document.getElementById('pensionDataTable').querySelector('tbody');
+    pensionDataTableBody.innerHTML = '';
     // Update the table
     const dataTableBody = document.getElementById('dataTable').querySelector('tbody');
     dataTableBody.innerHTML = '';
