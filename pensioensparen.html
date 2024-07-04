@@ -8,7 +8,9 @@
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="js/bruto_netto.js"></script>
     <script src="js/pensionscript.js"></script>
+    <script src="js/incomeChart.js"></script>
 </head>
 <body>
     <header>
@@ -31,16 +33,10 @@
                 <h1>Pensioensparen</h1>
                 
                 
-                <label for="grossIncome">Bruto Jaarinkomen: <span class="tooltip" title="Het bedrag dat je jaarlijks verdient, vóór belastingen. Als je je bruto jaarinkomen niet weet, kun je het berekenen met onze bruto/netto calculator.">ℹ️</span></label>
+                <label for="grossIncome">Bruto Jaarinkomen <a href="bruto_netto.html" target="_blank" style="color: blue; font-size: small;">bereken hier</a></label>
                 <div class="input-container">
-                    
                     <span>€</span>
                     <input type="number" id="grossIncome" value="30000" step="500">
-                    <div class="button-container">
-                        <button onclick="window.open('bruto_netto.html', '_blank')" class="calculator-button">
-                            <i class="fas fa-calculator"></i> Bereken jaarinkomen
-                        </button>
-                    </div>
                 </div>
                 <label for="startAmount">Startbedrag: <span class="tooltip" title="Het bedrag waarmee je begint te sparen. Bijvoorbeeld, als je al €15.000 hebt gespaard, vul je hier €15.000 in.">ℹ️</span></label>
                 <div class="input-container">
@@ -64,11 +60,6 @@
                     <input type="range" id="annualReturn" min="0" max="10" step="1" value="7" class="slider">
                     <span id="annualReturnDisplay">7%</span>
                 </div>
-                <label for="postRetirementReturn">Rendement na pensioen (%): <span class="tooltip" title="Het percentage rendement dat je verwacht te behalen op je spaargeld na je pensioen. ">ℹ️</span></label>
-                <div class="slider-container">
-                    <input type="range" id="postRetirementReturn" min="0" max="7" step="1" value="3" class="slider">
-                    <span id="postRetirementReturnDisplay">3%</span>
-                </div>
                 <label for="age">Huidige leeftijd:</label>
                 <div class="slider-container">
                     <input type="range" id="age" min="15" max="67" step="1" value="30" class="slider">
@@ -79,13 +70,25 @@
                     <input type="range" id="retirementAge" min="25" max="80" step="1" value="65" class="slider">
                     <span id="retirementAgeDisplay">65</span>
                 </div>
-                <label for="lifeExpectancy">Verwachte levensduur:</label>
-                <div class="slider-container">
-                    <input type="range" id="lifeExpectancy" min="70" max="110" step="1" value="90" class="slider">
-                    <span id="lifeExpectancyDisplay">90</span>
+                
+                <button class="collapsible">Geavanceerde opties</button>
+                <div class="advanced-options">
+                    <label for="postRetirementReturn">Rendement na pensioen (%): <span class="tooltip" title="Het percentage rendement dat je verwacht te behalen op je spaargeld na je pensioen. ">ℹ️</span></label>
+                    <div class="slider-container">
+                        <input type="range" id="postRetirementReturn" min="0" max="7" step="1" value="3" class="slider">
+                        <span id="postRetirementReturnDisplay">3%</span>
+                    </div>
+                    <label for="lifeExpectancy">Verwachte levensduur:</label>
+                    <div class="slider-container">
+                        <input type="range" id="lifeExpectancy" min="70" max="110" step="1" value="90" class="slider">
+                        <span id="lifeExpectancyDisplay">90</span>
+                    </div>
+                    <label for="incomeGrowth">Jaarlijkse Inkomensgroei:</label>
+                    <div class="slider-container">
+                        <input type="range" id="incomeGrowth" min="0" max="4" step="1" value="2" class="slider">
+                        <span id="incomeGrowthDisplay">2%</span>
+                    </div>
                 </div>
-                <label for="fiscalPartner">Fiscaal partner: <span class="tooltip" title="Vink dit aan als je een fiscaal partner hebt. Dit verdubbelt de vermogensvrijstelling.">ℹ️</span></label>
-                <input type="checkbox" id="fiscalPartner">
             </div>
             
             <div class="chart-container">
@@ -95,6 +98,10 @@
                 </div>
                 
                 <canvas id="pensionChartInleg"></canvas>
+                
+                <h2>Bruto Inkomen</h2>
+                <canvas id="incomeChart"></canvas>
+                
                 
                 <h2>Overzicht</h2>
                 

@@ -114,14 +114,27 @@ header nav ul li a {
     font-size: 18px; /* Increased font size */
     display: flex;
     align-items: center;
+    position: relative;
+}
+
+header nav ul li a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -5px;
+    left: 0;
+    background-color: #007bff;
+    transition: width 0.3s ease;
+}
+
+header nav ul li a:hover::after,
+header nav ul li a.active::after {
+    width: 100%;
 }
 
 header nav ul li a i {
     margin-right: 8px;
-}
-
-header nav ul li a.active {
-    color: #007bff; /* White text for better readability */
 }
 
 .container {
@@ -463,7 +476,7 @@ input[type="checkbox"] {
 }
 
 .button-container button {
-    background-color: #333;
+    background-color: #007bff;;
     color: #fff;
     border: none;
     padding: 10px 20px;
@@ -479,7 +492,7 @@ input[type="checkbox"] {
 }
 
 .button-container button:hover {
-    background-color: #555;
+    background-color: #006cdf;;
 }
 button {
     background-color: #333;
@@ -684,13 +697,13 @@ button:hover {
 
 }
 
-#chartjs-tooltip {
+.chartjs-tooltip {
     min-width: 280px;
     font-family: 'Poppins', sans-serif;
     background: rgba(255, 255, 255, 0.95);
     border-radius: 8px;
     color: #333;
-    opacity: 1;
+    opacity: 0;
     pointer-events: none;
     position: absolute;
     transform: translate(-50%, 0);
@@ -699,14 +712,17 @@ button:hover {
     padding: 16px;
 }
 
-#chartjs-tooltip .tooltip-header {
-    font-size: 16px;
+.chartjs-tooltip .tooltip-header {
     font-weight: bold;
     margin-bottom: 8px;
 }
 
-#chartjs-tooltip .tooltip-body {
+.chartjs-tooltip .tooltip-body {
     font-size: 14px;
+}
+
+#chartjs-tooltip .tooltip-body > div:first-child {
+    font-weight: bold;
 }
 
 #chartjs-tooltip .tooltip-row {
@@ -717,6 +733,7 @@ button:hover {
 
 #chartjs-tooltip .label {
     flex: 1;
+    text-align: left;
 }
 
 #chartjs-tooltip .value {
@@ -783,4 +800,57 @@ button:hover {
 
 .calculator-button:hover {
     background-color: #0063ce;
+}
+
+.collapsible {
+    background-color: #f9f9f9;
+    color: #333;
+    cursor: pointer;
+    padding: 15px 20px;
+    width: 100%;
+    border: 2px solid #ddd;
+    text-align: left;
+    outline: none;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.3s, border-color 0.3s;
+    font-family: 'Poppins', sans-serif;
+}
+
+.collapsible:hover {
+    background-color: #f1f1f1;
+    border-color: #ccc;
+}
+
+.collapsible::after {
+    content: '\25BC';
+    font-size: 14px;
+    color: #333;
+    transition: transform 0.3s;
+}
+
+.collapsible.active::after {
+    transform: rotate(-180deg);
+}
+
+.advanced-options {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    background-color: #fff;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    margin-top: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.advanced-options.show {
+    max-height: 800px; /* Adjust this value based on your content */
+    opacity: 1;
+    padding: 20px;
 }

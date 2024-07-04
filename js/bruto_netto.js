@@ -1,18 +1,9 @@
 document.addEventListener('DOMContentLoaded', (event) => {
     console.log('DOM fully loaded and parsed');
-    calculate(); // This will trigger the calculation and display, including the pie chart
+    initializeChart(); // Move this line here
+    updateSalaryInputLabel();
+    calculate();
     attachEventListeners();
-
-    const brutoHeader = document.getElementById('brutoHeader');
-    const nettoHeader = document.getElementById('nettoHeader');
-
-    // Stel standaard de tekst in
-    brutoHeader.textContent = 'Bruto';
-    nettoHeader.textContent = 'Netto';
-
-    // Stel de standaard berekeningsmodus in
-    calculationType = 'brutoToNetto';
-    calculate(); // Voer een initiële berekening uit
 });
 
 
@@ -99,9 +90,13 @@ function swapCalculation() {
 
 function calculateNetSalary(grossMonthlySalary, applyTaxCredit = true) {
     const grossAnnualSalary = grossMonthlySalary * 12;
-    const vacationMoneyEnabled = document.getElementById('vacationMoney').checked;
-    const thirteenthMonthEnabled = document.getElementById('thirteenthMonth').checked;
-    const age = parseInt(document.getElementById('age').value) || 0;
+    const vacationMoneyCheckbox = document.getElementById('vacationMoney');
+    const thirteenthMonthCheckbox = document.getElementById('thirteenthMonth');
+    const ageInput = document.getElementById('age');
+    
+    const vacationMoneyEnabled = vacationMoneyCheckbox ? vacationMoneyCheckbox.checked : false;
+    const thirteenthMonthEnabled = thirteenthMonthCheckbox ? thirteenthMonthCheckbox.checked : false;
+    const age = ageInput ? parseInt(ageInput.value) || 0 : 0;
     const isAOWAge = age >= 67;
 
     // Calculate vacation money and thirteenth month correctly
@@ -352,15 +347,18 @@ function updateResultsSummary() {
 }
 
 function calculate() {
-    const salaryInput = parseFloat(document.getElementById('salary').value) || 0;
-    const frequency = document.querySelector('.toggle-buttons .active').id === 'monthlyToggle' ? 'monthly' : 'annual';
-    const age = parseInt(document.getElementById('age').value) || 0;
+    const salaryInput = document.getElementById('salary');
+    const salaryValue = salaryInput ? parseFloat(salaryInput.value) || 0 : 0;
+    const frequencyButton = document.querySelector('.toggle-buttons .active');
+    const frequency = frequencyButton ? (frequencyButton.id === 'monthlyToggle' ? 'monthly' : 'annual') : 'monthly';
+    const ageInput = document.getElementById('age');
+    const age = ageInput ? parseInt(ageInput.value) || 0 : 0;
 
     let salaries;
     if (calculationType === 'brutoToNetto') {
-        salaries = calculateNetSalary(salaryInput);
+        salaries = calculateNetSalary(salaryValue);
     } else {
-        const brutoSalary = calculateBrutoFromNetto(salaryInput);
+        const brutoSalary = calculateBrutoFromNetto(salaryValue);
         salaries = calculateNetSalary(brutoSalary);
     }
 
@@ -377,7 +375,12 @@ function toggleFrequency(button, type) {
 let taxPieChartInstance; // Global variable to store the chart instance
 
 function initializeChart() {
-    const ctx = document.getElementById('taxPieChart').getContext('2d');
+    const ctx = document.getElementById('taxPieChart');
+    if (!ctx) {
+        console.error('Canvas element not found');
+        return;
+    }
+
     taxPieChartInstance = new Chart(ctx, {
         type: 'pie',
         data: {
@@ -408,8 +411,6 @@ function initializeChart() {
         }
     });
 }
-
-initializeChart(); // Initialize the chart once
 
 function calculateBrutoFromNetto(netMonthlySalary, applyTaxCredit = true) {
     // Begin met een schatting van het bruto salaris
@@ -471,7 +472,12 @@ function updateSummary() {
 }
 
 function updateSalaryInputLabel() {
-    const salaryLabel = document.getElementById('salaryLabel');
+    const salaryLabel = document.querySelector('label[for="salary"]');
+    if (!salaryLabel) {
+        console.error('Salary label not found');
+        return;
+    }
+
     if (calculationType === 'brutoToNetto') {
         salaryLabel.innerHTML = 'Bruto Maandsalaris: <span class="tooltip" title="Voer hier je bruto maandsalaris in.">ℹ️</span>';
     } else {
@@ -484,3 +490,19 @@ document.addEventListener('DOMContentLoaded', (event) => {
     updateSalaryInputLabel(); // Update bij het laden van de pagina
     calculate(); // Voer een initiële berekening uit
 });
+
+function calculateBrutoNetto() {
+    const salary = parseFloat(document.getElementById('salary').value);
+    const frequency = document.querySelector('.toggle-buttons .active').id === 'monthlyToggle' ? 'monthly' : 'annual';
+    
+    let salaries;
+    if (calculationType === 'brutoToNetto') {
+        salaries = calculateNetSalary(salary);
+    } else {
+        const brutoSalary = calculateBrutoFromNetto(salary);
+        salaries = calculateNetSalary(brutoSalary);
+    }
+
+    displayResults(salaries, frequency);
+}
+window.calculateBrutoNetto = calculateBrutoNetto;

@@ -126,7 +126,7 @@ function berekenBox3Sparen() {
                         titleFont: {
                             size: 16,
                             weight: 'bold',
-                            family: "'Poppins', sans-serif" // Assuming you're using Poppins font
+                            family: "'Poppins', sans-serif"
                         },
                         bodyColor: '#666',
                         bodyFont: {
@@ -148,10 +148,17 @@ function berekenBox3Sparen() {
                                 const eigenInleg = tooltipItems[1].parsed.y;
                                 const rendement = spaargeld - eigenInleg;
                                 
+                                const formatNumber = (num) => '€' + num.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                                const padRight = (str, length) => str.padStart(length, ' ');
+                                
+                                const labelWidth = 15;
+                                const valueWidth = 15;
+                                const formatLabel = (label) => label.padEnd(labelWidth);
+                                const formatValue = (value) => formatNumber(value).padStart(valueWidth);
                                 return [
-                                    'Spaargeld:      €' + spaargeld.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, "."),
-                                    'Eigen inleg:    €' + eigenInleg.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, "."),
-                                    'Totaal rendement: €' + rendement.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+                                    `${formatLabel('Spaargeld:')}${formatValue(spaargeld)}`,
+                                    `${formatLabel('Eigen inleg:')}${formatValue(eigenInleg)}`,
+                                    `${formatLabel('Rendement:')}${formatValue(rendement)}`
                                 ];
                             },
                             labelTextColor: function(context) {
@@ -237,7 +244,6 @@ function customTooltip(chart) {
     if (!tooltipEl) {
         const newTooltip = document.createElement('div');
         newTooltip.id = 'chartjs-tooltip';
-        newTooltip.innerHTML = '<div class="tooltip-header"></div><div class="tooltip-body"></div>';
         document.body.appendChild(newTooltip);
     }
 
@@ -247,24 +253,45 @@ function customTooltip(chart) {
         return;
     }
 
-    const headerEl = tooltipEl.querySelector('.tooltip-header');
-    const bodyEl = tooltipEl.querySelector('.tooltip-body');
+    // Get the data for the tooltip
+    const dataPoint = tooltipModel.dataPoints[0];
+    const spaargeld = parseFloat(dataPoint.raw);
+    const eigenInleg = parseFloat(chart.data.datasets[1].data[dataPoint.dataIndex]);
+    const rendement = spaargeld - eigenInleg;
 
-    headerEl.textContent = tooltipModel.title[0];
-    
-    const bodyLines = tooltipModel.body.map(b => b.lines).flat();
-    bodyEl.innerHTML = bodyLines.map((line, i) => {
-        if (i === 0) {
-            return `<span class="total">${line}</span>`;
-        }
-        return line;
-    }).join('\n');
+    // Create the tooltip content
+    let tooltipContent = `
+        <div class="tooltip-header">Jaar: ${dataPoint.label}</div>
+        <div class="tooltip-body">
+            <div class="tooltip-row">
+                <span class="label">Spaargeld:</span>
+                <span class="value">${formatNumber(spaargeld)}</span>
+            </div>
+            <div class="tooltip-row">
+                <span class="label">Eigen inleg:</span>
+                <span class="value">${formatNumber(eigenInleg)}</span>
+            </div>
+            <div class="tooltip-row">
+                <span class="label">Rendement:</span>
+                <span class="value">${formatNumber(rendement)}</span>
+            </div>
+        </div>
+    `;
 
+    // Set the tooltip content
+    tooltipEl.innerHTML = tooltipContent;
+
+    // Position the tooltip
     const position = chart.canvas.getBoundingClientRect();
     tooltipEl.style.opacity = 1;
     tooltipEl.style.position = 'absolute';
     tooltipEl.style.left = position.left + window.pageXOffset + tooltipModel.caretX + 'px';
     tooltipEl.style.top = position.top + window.pageYOffset + tooltipModel.caretY + 'px';
+}
+
+// Helper function to format numbers
+function formatNumber(num) {
+    return '€' + num.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
 
 // After creating the chart:
