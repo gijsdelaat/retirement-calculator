@@ -683,3 +683,84 @@ button:hover {
     color: #333;
 
 }
+
+#chartjs-tooltip {
+    min-width: 280px;
+    font-family: 'Poppins', sans-serif;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
+    color: #333;
+    opacity: 1;
+    pointer-events: none;
+    position: absolute;
+    transform: translate(-50%, 0);
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    padding: 16px;
+}
+
+#chartjs-tooltip .tooltip-header {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+#chartjs-tooltip .tooltip-body {
+    font-size: 14px;
+}
+
+#chartjs-tooltip .tooltip-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+#chartjs-tooltip .label {
+    flex: 1;
+}
+
+#chartjs-tooltip .value {
+    flex: 0 0 auto;
+    font-family: monospace;
+    text-align: right;
+    margin-left: 16px;
+}
+
+#chartjs-tooltip .total {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+.estimated-total-container {
+    margin: 20px auto;
+    padding: 15px;
+    background-color: #f2f2f2;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    text-align: center;
+    width: 80%; /* Adjust width as necessary */
+}
+
+.estimated-total-container h2 {
+    color: #333;
+    font-size: 18px;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.subheader-row {
+    font-weight: bold;
+    background-color: #f0f0f0;
+}
+.subtotal-row {
+    font-style: italic;
+    border-top: 1px solid #ddd;
+}
+.total-row {
+    font-weight: bold;
+    border-top: 2px solid #000;
+}
+.negative-value {
+    color: #ff0000;
+}

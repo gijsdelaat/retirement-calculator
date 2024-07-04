@@ -101,23 +101,29 @@ function calculateNetSalary(grossMonthlySalary, applyTaxCredit = true) {
     const grossAnnualSalary = grossMonthlySalary * 12;
     const vacationMoneyEnabled = document.getElementById('vacationMoney').checked;
     const thirteenthMonthEnabled = document.getElementById('thirteenthMonth').checked;
+    const age = parseInt(document.getElementById('age').value) || 0;
+    const isAOWAge = age >= 67;
 
     // Calculate vacation money and thirteenth month correctly
-    const vacationMoney = vacationMoneyEnabled ? grossAnnualSalary * 0.08 : 0; // 8% of the annual salary
-    const thirteenthMonth = thirteenthMonthEnabled ? grossMonthlySalary : 0; // One extra month salary
+    const vacationMoney = vacationMoneyEnabled ? grossAnnualSalary * 0.08 : 0;
+    const thirteenthMonth = thirteenthMonthEnabled ? grossMonthlySalary : 0;
 
     // Correctly calculate the total gross annual income
     const totalGrossAnnualIncome = grossAnnualSalary + vacationMoney + thirteenthMonth;
 
     // Calculate tax based on the total gross annual income
-    const taxAmount = calculateTax(totalGrossAnnualIncome);
+    const taxAmount = calculateTax(totalGrossAnnualIncome, isAOWAge);
 
     // Calculate tax credits
-    const algemeneHeffingskorting = calculateAlgemeneHeffingskorting(totalGrossAnnualIncome);
-    const arbeidskorting = calculateArbeidskorting(totalGrossAnnualIncome);
-    const heffingskortingen = applyTaxCredit ? (algemeneHeffingskorting + arbeidskorting) : 0;
+    const algemeneHeffingskorting = calculateAlgemeneHeffingskorting(totalGrossAnnualIncome, isAOWAge);
+    const arbeidskorting = calculateArbeidskorting(totalGrossAnnualIncome, isAOWAge);
+    const ouderenkorting = isAOWAge ? calculateOuderenkorting(totalGrossAnnualIncome) : 0;
+    const heffingskortingen = applyTaxCredit ? (algemeneHeffingskorting + arbeidskorting + ouderenkorting) : 0;
 
-    const netAnnualSalary = totalGrossAnnualIncome - taxAmount + heffingskortingen;
+    // Ensure that the applied tax credits don't exceed the tax amount
+    const effectiveTaxAmount = Math.max(0, taxAmount - heffingskortingen);
+
+    const netAnnualSalary = totalGrossAnnualIncome - effectiveTaxAmount;
     const netMonthlySalary = netAnnualSalary / 12;
 
     return {
@@ -126,52 +132,67 @@ function calculateNetSalary(grossMonthlySalary, applyTaxCredit = true) {
         grossMonthlySalary: grossMonthlySalary,
         grossAnnualSalary: totalGrossAnnualIncome,
         taxAmount: taxAmount,
+        effectiveTaxAmount: effectiveTaxAmount,
         vacationMoney: vacationMoney,
-        thirteenthMonth: thirteenthMonth
+        thirteenthMonth: thirteenthMonth,
+        algemeneHeffingskorting: algemeneHeffingskorting,
+        arbeidskorting: arbeidskorting,
+        ouderenkorting: ouderenkorting
     };
 }
 
-function calculateTax(grossAnnualSalary) {
-    const taxRate1 = 0.3697; // Tarief voor schijf 1
-    const taxRate2 = 0.4950; // Tarief voor schijf 2
-    const threshold = 73031; // Drempel voor schijf 2
+function calculateTax(grossAnnualSalary, isAOWAge) {
+    let taxAmount = 0;
 
-    let taxAmount;
-
-    if (grossAnnualSalary <= threshold) {
-        taxAmount = grossAnnualSalary * taxRate1;
+    if (isAOWAge) {
+        // Belastingschijven voor AOW-gerechtigden
+        if (grossAnnualSalary <= 38098) {
+            taxAmount = grossAnnualSalary * 0.1907;
+        } else if (grossAnnualSalary <= 75518) {
+            taxAmount = 38098 * 0.1907 + (grossAnnualSalary - 38098) * 0.3697;
+        } else {
+            taxAmount = 38098 * 0.1907 + (75518 - 38098) * 0.3697 + (grossAnnualSalary - 75518) * 0.4950;
+        }
     } else {
-        taxAmount = (threshold * taxRate1) + ((grossAnnualSalary - threshold) * taxRate2);
+        // Belastingschijven voor niet-AOW-gerechtigden
+        if (grossAnnualSalary <= 75518) {
+            taxAmount = grossAnnualSalary * 0.3697;
+        } else {
+            taxAmount = 75518 * 0.3697 + (grossAnnualSalary - 75518) * 0.4950;
+        }
     }
 
     return taxAmount;
 }
 
-function calculateAlgemeneHeffingskorting(totalGrossAnnualIncome, aowLeeftijd = false) {
-    if (aowLeeftijd) {
-        // Berekeningen voor mensen die in 2024 de AOW-leeftijd bereiken of hebben
+function calculateAlgemeneHeffingskorting(totalGrossAnnualIncome, isAOWAge) {
+    if (isAOWAge) {
+        // Berekening voor AOW-gerechtigden
         if (totalGrossAnnualIncome <= 24813) {
             return 1735;
         } else if (totalGrossAnnualIncome <= 75518) {
-            return 1735 - ((totalGrossAnnualIncome - 24812) * 0.03421);
+            return Math.max(0, 1735 - 0.03421 * (totalGrossAnnualIncome - 24812));
         } else {
             return 0;
         }
     } else {
-        // Berekeningen voor mensen die in 2024 nog niet de AOW-leeftijd bereiken
-        if (totalGrossAnnualIncome <= 24813) {
-            return 3362;
-        } else if (totalGrossAnnualIncome <= 75518) {
-            return 3362 - ((totalGrossAnnualIncome - 24812) * 0.06630);
+        // Bestaande berekening voor niet-AOW-gerechtigden
+        const maxKorting = 3362;
+        const startAfbouw = 24814;
+        const afbouwPercentage = 0.0663;
+
+        if (totalGrossAnnualIncome <= startAfbouw) {
+            return maxKorting;
         } else {
-            return 0;
+            const korting = maxKorting - ((totalGrossAnnualIncome - startAfbouw) * afbouwPercentage);
+            return Math.max(0, korting);
         }
     }
 }
 
-function calculateArbeidskorting(totalGrossAnnualIncome, aowLeeftijd = false) {
-    if (aowLeeftijd) {
-        // Berekeningen voor mensen die in 2024 de AOW-leeftijd bereiken
+function calculateArbeidskorting(totalGrossAnnualIncome, isAOWAge) {
+    if (isAOWAge) {
+        // Berekening voor AOW-gerechtigden
         if (totalGrossAnnualIncome < 11491) {
             return totalGrossAnnualIncome * 0.04346;
         } else if (totalGrossAnnualIncome < 24821) {
@@ -179,12 +200,12 @@ function calculateArbeidskorting(totalGrossAnnualIncome, aowLeeftijd = false) {
         } else if (totalGrossAnnualIncome < 39958) {
             return 2662 + (totalGrossAnnualIncome - 24820) * 0.01275;
         } else if (totalGrossAnnualIncome < 124935) {
-            return 2854 - (totalGrossAnnualIncome - 39957) * 0.03358;
+            return Math.max(0, 2854 - (totalGrossAnnualIncome - 39957) * 0.03358);
         } else {
             return 0;
         }
     } else {
-        // Berekeningen voor mensen die in 2024 nog niet de AOW-leeftijd bereiken
+        // Bestaande berekening voor niet-AOW-gerechtigden
         if (totalGrossAnnualIncome < 11491) {
             return totalGrossAnnualIncome * 0.08425;
         } else if (totalGrossAnnualIncome < 24821) {
@@ -192,76 +213,124 @@ function calculateArbeidskorting(totalGrossAnnualIncome, aowLeeftijd = false) {
         } else if (totalGrossAnnualIncome < 39958) {
             return 5158 + (totalGrossAnnualIncome - 24820) * 0.02471;
         } else if (totalGrossAnnualIncome < 124935) {
-            return 5532 - (totalGrossAnnualIncome - 39957) * 0.06510;
+            return Math.max(0, 5532 - (totalGrossAnnualIncome - 39957) * 0.06510);
         } else {
             return 0;
         }
     }
 }
 
-function displayResults(salaries, frequency) {
-    console.log('Displaying results');
-    const isMonthly = frequency === 'monthly';
-    grossIncome = isMonthly ? salaries.grossMonthlySalary : salaries.grossAnnualSalary;
-    netIncome = isMonthly ? salaries.monthlyNetSalary : salaries.annualNetSalary;
-    const taxAmount = isMonthly ? salaries.taxAmount / 12 : salaries.taxAmount;
-    arbeidskorting = isMonthly ? calculateArbeidskorting(salaries.grossAnnualSalary) / 12 : calculateArbeidskorting(salaries.grossAnnualSalary);
-    algemeneHeffingskorting = isMonthly ? calculateAlgemeneHeffingskorting(salaries.grossAnnualSalary) / 12 : calculateAlgemeneHeffingskorting(salaries.grossAnnualSalary);
-    inkomstenbelasting = taxAmount - arbeidskorting - algemeneHeffingskorting;
+function calculateOuderenkorting(totalGrossAnnualIncome) {
+    const maxKorting = 2010;
+    const inkomensgrens = 44770;
 
-    const resultsTable = `
-        <table class="results-table">
-            <tr>
-                <td>${isMonthly ? 'Maandelijks' : 'Jaarlijks'} Bruto Loon</td>
-                <td>€${grossIncome.toFixed(2)}</td>
-            </tr>
-            <tr>
-                <td>Bruto Loon</td>
-                <td>€${grossIncome.toFixed(2)}</td>
-                <td>€${grossIncome.toFixed(2)}</td>
-            </tr>
-            <tr><td colspan="3" class="sum-line">&nbsp;</td></tr>
-            <tr>
-                <td>Belasting box 1</td>
-                <td>€${taxAmount.toFixed(2)}</td>
-            </tr>
-            <tr>
-                <td>Arbeidskorting</td>
-                <td>€${arbeidskorting.toFixed(2)} –</td>
-            </tr>
-            <tr>
-                <td>Algemene heffingskorting</td>
-                <td>€${algemeneHeffingskorting.toFixed(2)} –</td>
-            </tr>
-
-            <tr>
-                <td>Inkomstenbelasting</td>
-                <td></td>
-                <td>€${(inkomstenbelasting).toFixed(2)}-</td>
-            </tr>
-            <tr><td colspan="3" class="sum-line">&nbsp;</td></tr>
-            <tr>
-                <td>${isMonthly ? 'Maandelijks' : 'Jaarlijks'} Netto Loon</td>
-                <td></td>
-                <td>€${netIncome.toFixed(2)}</td>
-            </tr>
-        </table>
-    `;
-
-    document.getElementById('resultsTable').innerHTML = resultsTable;
-
-    // Calculate tax percentage
-    const taxPercentage = (salaries.taxAmount / salaries.grossAnnualSalary) * 100;
-
-    // Update chart data
-    updateChartData([inkomstenbelasting, netIncome]);
+    if (totalGrossAnnualIncome <= inkomensgrens) {
+        return maxKorting;
+    } else {
+        return 0;
+    }
 }
 
-function updateChartData(newData) {
-    if (taxPieChartInstance) {
-        taxPieChartInstance.data.datasets[0].data = newData;
-        taxPieChartInstance.update();
+function displayResults(salaries, frequency) {
+    const table = document.getElementById('resultsTable');
+    table.innerHTML = ''; // Clear existing content
+
+    const isAOWAge = parseInt(document.getElementById('age').value) >= 67;
+
+    const factor = frequency === 'monthly' ? 12 : 1;
+
+    const rows = [
+        { label: 'Bruto salaris', value: salaries.grossAnnualSalary / factor },
+        { label: 'Loonheffing', value: -salaries.taxAmount / factor, isNegative: true },
+        { label: 'Totaal heffingskortingen:', value: 0, isSubheader: true },
+        { label: '- Algemene heffingskorting', value: salaries.algemeneHeffingskorting / factor, indent: true },
+        { label: '- Arbeidskorting', value: salaries.arbeidskorting / factor, indent: true }
+    ];
+
+    if (isAOWAge) {
+        rows.push({ label: '- Ouderenkorting', value: salaries.ouderenkorting / factor, indent: true });
     }
+
+    const totalHeffingskortingen = (salaries.algemeneHeffingskorting + salaries.arbeidskorting + salaries.ouderenkorting) / factor;
+    rows.push({ label: 'Totaal heffingskortingen', value: totalHeffingskortingen, isSubtotal: true });
+
+    rows.push({ label: 'Effectieve loonheffing', value: -salaries.effectiveTaxAmount / factor, isNegative: true });
+    rows.push({ label: 'Netto salaris', value: salaries.annualNetSalary / factor, isTotal: true });
+
+    rows.forEach(row => {
+        const tr = document.createElement('tr');
+        const labelCell = document.createElement('td');
+        const valueCell = document.createElement('td');
+
+        labelCell.textContent = row.label;
+        valueCell.textContent = row.value ? formatCurrency(row.value) : '';
+
+        if (row.isSubheader) {
+            tr.classList.add('subheader-row');
+            valueCell.textContent = '';
+        }
+        if (row.isSubtotal) tr.classList.add('subtotal-row');
+        if (row.isTotal) tr.classList.add('total-row');
+        if (row.indent) labelCell.style.paddingLeft = '20px';
+        if (row.isNegative) valueCell.classList.add('negative-value');
+
+        tr.appendChild(labelCell);
+        tr.appendChild(valueCell);
+        table.appendChild(tr);
+    });
+
+    updateChart(salaries, frequency);
+    updateSummary(); // Call this after updating the chart
+}
+
+function formatCurrency(value) {
+    return '€' + value.toFixed(2);
+}
+
+function updateChart(salaries, frequency) {
+    const factor = frequency === 'monthly' ? 12 : 1;
+    const grossIncome = salaries.grossAnnualSalary / factor;
+    const effectiveTaxAmount = salaries.effectiveTaxAmount / factor;
+    const netIncome = salaries.annualNetSalary / factor;
+
+    const ctx = document.getElementById('taxPieChart').getContext('2d');
+    
+    if (taxPieChartInstance) {
+        taxPieChartInstance.destroy();
+    }
+
+    taxPieChartInstance = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Netto inkomen', 'Effectieve loonheffing'],
+            datasets: [{
+                data: [netIncome, effectiveTaxAmount],
+                backgroundColor: ['#36a2eb', '#ff6384']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed !== null) {
+                                label += formatCurrency(context.parsed);
+                            }
+                            return label;
+                        }
+                    }
+                }
+            }
+        }
+    });
 }
 
 let grossIncome, netIncome, inkomstenbelasting, arbeidskorting, algemeneHeffingskorting, isMonthly;
@@ -285,6 +354,7 @@ function updateResultsSummary() {
 function calculate() {
     const salaryInput = parseFloat(document.getElementById('salary').value) || 0;
     const frequency = document.querySelector('.toggle-buttons .active').id === 'monthlyToggle' ? 'monthly' : 'annual';
+    const age = parseInt(document.getElementById('age').value) || 0;
 
     let salaries;
     if (calculationType === 'brutoToNetto') {
@@ -372,22 +442,26 @@ function updateSummary() {
     if (!taxPieChartInstance) return;
 
     const data = taxPieChartInstance.data.datasets[0].data;
-    if (data.length < 2) return; // Zorg ervoor dat er genoeg data is
+    if (data.length < 2) return; // Ensure there's enough data
 
-    const netIncome = data[1];
-    const taxes = data[0];
-    const grossIncome = netIncome + taxes; // Aanname dat bruto inkomen gelijk is aan netto plus belastingen
-    const taxRate = (taxes / grossIncome) * 100;
+    const netIncome = data[0]; // Net income is the first slice of the pie
+    const taxes = data[1]; // Taxes (effective loonheffing) is the second slice
+    const grossIncome = netIncome + taxes; // Gross income is the sum of net income and taxes
 
-    const incomeType = (calculationType === 'brutoToNetto') ? 'Netto' : 'Bruto';
+    // Calculate tax burden as a percentage of gross income
+    const taxBurden = (taxes / grossIncome) * 100;
+
+    const incomeType = (calculationType === 'brutoToNetto') ? 'Bruto' : 'Netto';
+    const incomeValue = (calculationType === 'brutoToNetto') ? grossIncome : netIncome;
     const incomeSummaryElement = document.getElementById('incomeSummary');
     const taxSummaryElement = document.getElementById('taxSummary');
 
     incomeSummaryElement.innerHTML = `
-    <div class="summary-item"><strong>${incomeType} inkomen:</strong> €${netIncome.toFixed(2)}</div>
+    <div class="summary-item"><strong>Bruto inkomen:</strong> €${grossIncome.toFixed(2)}</div>
+    <div class="summary-item"><strong>Netto inkomen:</strong> €${netIncome.toFixed(2)}</div>
     <div class="summary-item"><strong>Belasting:</strong> €${taxes.toFixed(2)}</div>
-    <div class="summary-item"><strong>Belastingdruk:</strong> ${taxRate.toFixed(2)}% van uw inkomen</div>
-`;
+    <div class="summary-item"><strong>Belastingdruk:</strong> ${taxBurden.toFixed(2)}% van uw inkomen</div>
+    `;
 
     // Apply consistent styling
     incomeSummaryElement.style.fontSize = '18px';

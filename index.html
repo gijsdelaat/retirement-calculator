@@ -31,14 +31,14 @@
                 <label for="startAmount">Startbedrag: <span class="tooltip" title="Het bedrag waarmee je begint te sparen. Bijvoorbeeld, als je al €15.000 hebt gespaard, vul je hier €15.000 in.">ℹ️</span></label>
                 <div class="input-container">
                     <span>€</span>
-                    <input type="number" id="startAmount" value="15000" step="1000">
+                    <input type="number" id="startAmount" value="2000" step="500">
                 </div>
 
                 <label for="annualContribution">Bijdrage: <span class="tooltip" title="Het bedrag dat je jaarlijks of maandelijks bijdraagt aan je spaargeld. Bijvoorbeeld, als je elk jaar €18.000 bijdraagt, vul je hier €18.000 in.">ℹ️</span></label>
                 <div class="input-toggle-container">
                     <div class="input-container small-input">
                         <span>€</span>
-                        <input type="number" id="annualContribution" value="18000" step="500">
+                        <input type="number" id="annualContribution" value="2400" step="100">
                     </div>
                     <div class="toggle-buttons">
                         <button id="annualToggle" class="active" onclick="toggleFrequency(this, 'contribution')">Jaarlijks</button>
@@ -52,12 +52,6 @@
                     <span id="annualReturnDisplay">8%</span>
                 </div>
 
-                <label for="age">Huidige leeftijd:</label>
-                <div class="slider-container">
-                    <input type="range" id="age" min="15" max="67" step="1" value="30" class="slider">
-                    <span id="ageDisplay">30</span>
-                </div>
-
                 <label for="savingsDuration">Spaarduur (jaren):</label>
                 <div class="slider-container">
                     <input type="range" id="savingsDuration" min="1" max="50" step="1" value="35" class="slider">
@@ -66,16 +60,26 @@
 
                 <label for="fiscalPartner">Fiscaal partner: <span class="tooltip" title="Vink dit aan als je een fiscaal partner hebt. Dit verdubbelt de vermogensvrijstelling.">ℹ️</span></label>
                 <input type="checkbox" id="fiscalPartner">
+                <label for="alleenstaand">Alleenstaand:</label>
+                <input type="checkbox" id="alleenstaand" name="alleenstaand">
             </div>
 
             <div class="chart-container">
-                <canvas id="savingsChart"></canvas>
+                <div class="estimated-withdrawal-container">
+                    <h2>Totaal Vermogen na Spaarduur:</h2>
+                    <p id="estimatedTotalDisplay">€0</p>
+                </div>
+                </div>
+                
+                <div style="height: 400px;">
+                    <canvas id="savingsChart"></canvas>
+                </div>
         
                 <h2>Overzicht</h2>
                 <table id="dataTable">
                     <thead>
                         <tr>
-                            <th>Leeftijd</th>
+                            <th>Jaar</th>
                             <th>Spaargeld (€)</th>
                             <th>Jaarlijks Rendement (€) <span class="tooltip" title="Dit is het bedrag dat je dat jaar verdient aan rendement op je spaargeld en beleggingen.">ℹ️</span></th>
                             <th>Box 3 Belasting (€)</th>
@@ -90,5 +94,5 @@
     </div>
     <script src="js/script.js"></script>
 </body>
-</html>
 
+</html>
