@@ -29,21 +29,23 @@
         <div class="content">
             <div class="calculator">
                 <h1>Pensioensparen</h1>
+                
+                
+                <label for="grossIncome">Bruto Jaarinkomen: <span class="tooltip" title="Het bedrag dat je jaarlijks verdient, vóór belastingen. Als je je bruto jaarinkomen niet weet, kun je het berekenen met onze bruto/netto calculator.">ℹ️</span></label>
+                <div class="input-container">
+                    
+                    <span>€</span>
+                    <input type="number" id="grossIncome" value="30000" step="500">
+                    <div class="button-container">
+                        <button onclick="window.open('bruto_netto.html', '_blank')" class="calculator-button">
+                            <i class="fas fa-calculator"></i> Bereken jaarinkomen
+                        </button>
+                    </div>
+                </div>
                 <label for="startAmount">Startbedrag: <span class="tooltip" title="Het bedrag waarmee je begint te sparen. Bijvoorbeeld, als je al €15.000 hebt gespaard, vul je hier €15.000 in.">ℹ️</span></label>
                 <div class="input-container">
                     <span>€</span>
                     <input type="number" id="startAmount" value="5000" step="500">
-                </div>
-                <label for="grossIncome">Bruto Inkomen: <span class="tooltip" title="Het bedrag dat je jaarlijks of maandelijks verdient. Bijvoorbeeld, als je elk jaar €40.000 verdient, vul je hier €40.000 in.">ℹ️</span></label>
-                <div class="input-toggle-container">
-                    <div class="input-container small-input">
-                        <span>€</span>
-                        <input type="number" id="grossIncome" value="30000" step="500">
-                    </div>
-                    <div class="toggle-buttons">
-                        <button id="annualIncomeToggle" class="active" onclick="toggleFrequency(this, 'income')">Jaarlijks</button>
-                        <button id="monthlyIncomeToggle" onclick="toggleFrequency(this, 'income')">Maandelijks</button>
-                    </div>
                 </div>
                 
                 <label for="annualContribution">Bijdrage: <span class="tooltip" title="Het bedrag dat je jaarlijks of maandelijks bijdraagt aan je pensioen. Bijvoorbeeld, als je elk jaar €18.000 bijdraagt, vul je hier €18.000 in.">ℹ️</span></label>

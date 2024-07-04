@@ -764,3 +764,23 @@ button:hover {
 .negative-value {
     color: #ff0000;
 }
+
+.button-container {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.calculator-button {
+    display: inline-block;
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.calculator-button:hover {
+    background-color: #0063ce;
+}
