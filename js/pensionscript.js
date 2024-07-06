@@ -369,3 +369,4 @@ function calculate() {
     console.log('Calculating pension data');
     berekenPensioensparen();
 }
+
