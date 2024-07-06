@@ -698,23 +698,24 @@ button:hover {
 }
 
 .chartjs-tooltip {
-    min-width: 280px;
-    font-family: 'Poppins', sans-serif;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 8px;
-    color: #333;
     opacity: 0;
-    pointer-events: none;
     position: absolute;
-    transform: translate(-50%, 0);
+    background: rgba(255, 255, 255, 0.95);
+    color: #333;
+    border-radius: 3px;
     transition: all 0.2s ease;
+    pointer-events: none;
+    transform: translate(-50%, 0);
     box-shadow: 0 4px 20px rgba(0,0,0,0.1);
     padding: 16px;
+    font-size: 14px;
+    max-width: 300px;
 }
 
 .chartjs-tooltip .tooltip-header {
     font-weight: bold;
     margin-bottom: 8px;
+    font-size: 16px;
 }
 
 .chartjs-tooltip .tooltip-body {
@@ -725,15 +726,21 @@ button:hover {
     font-weight: bold;
 }
 
-#chartjs-tooltip .tooltip-row {
+.chartjs-tooltip .tooltip-row {
     display: flex;
     justify-content: space-between;
     margin-bottom: 4px;
 }
 
-#chartjs-tooltip .label {
-    flex: 1;
-    text-align: left;
+.chartjs-tooltip .label {
+    margin-right: 10px;
+}
+
+.chartjs-tooltip .tooltip-color-box {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 5px;
 }
 
 #chartjs-tooltip .value {

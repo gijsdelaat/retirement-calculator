@@ -88,16 +88,13 @@ function swapCalculation() {
 
 
 
-function calculateNetSalary(grossMonthlySalary, applyTaxCredit = true) {
+function calculateNetSalary(grossMonthlySalary, applyTaxCredit = true, age = 30) {
     const grossAnnualSalary = grossMonthlySalary * 12;
     const vacationMoneyCheckbox = document.getElementById('vacationMoney');
     const thirteenthMonthCheckbox = document.getElementById('thirteenthMonth');
-    const ageInput = document.getElementById('age');
     
     const vacationMoneyEnabled = vacationMoneyCheckbox ? vacationMoneyCheckbox.checked : false;
     const thirteenthMonthEnabled = thirteenthMonthCheckbox ? thirteenthMonthCheckbox.checked : false;
-    const age = ageInput ? parseInt(ageInput.value) || 0 : 0;
-    const isAOWAge = age >= 67;
 
     // Calculate vacation money and thirteenth month correctly
     const vacationMoney = vacationMoneyEnabled ? grossAnnualSalary * 0.08 : 0;
@@ -107,12 +104,12 @@ function calculateNetSalary(grossMonthlySalary, applyTaxCredit = true) {
     const totalGrossAnnualIncome = grossAnnualSalary + vacationMoney + thirteenthMonth;
 
     // Calculate tax based on the total gross annual income
-    const taxAmount = calculateTax(totalGrossAnnualIncome, isAOWAge);
+    const taxAmount = calculateTax(totalGrossAnnualIncome, age);
 
     // Calculate tax credits
-    const algemeneHeffingskorting = calculateAlgemeneHeffingskorting(totalGrossAnnualIncome, isAOWAge);
-    const arbeidskorting = calculateArbeidskorting(totalGrossAnnualIncome, isAOWAge);
-    const ouderenkorting = isAOWAge ? calculateOuderenkorting(totalGrossAnnualIncome) : 0;
+    const algemeneHeffingskorting = calculateAlgemeneHeffingskorting(totalGrossAnnualIncome, age);
+    const arbeidskorting = calculateArbeidskorting(totalGrossAnnualIncome, age);
+    const ouderenkorting = age >= 67 ? calculateOuderenkorting(totalGrossAnnualIncome) : 0;
     const heffingskortingen = applyTaxCredit ? (algemeneHeffingskorting + arbeidskorting + ouderenkorting) : 0;
 
     // Ensure that the applied tax credits don't exceed the tax amount
@@ -136,10 +133,10 @@ function calculateNetSalary(grossMonthlySalary, applyTaxCredit = true) {
     };
 }
 
-function calculateTax(grossAnnualSalary, isAOWAge) {
+function calculateTax(grossAnnualSalary, age) {
     let taxAmount = 0;
 
-    if (isAOWAge) {
+    if (age >= 67) {
         // Belastingschijven voor AOW-gerechtigden
         if (grossAnnualSalary <= 38098) {
             taxAmount = grossAnnualSalary * 0.1907;
@@ -160,8 +157,8 @@ function calculateTax(grossAnnualSalary, isAOWAge) {
     return taxAmount;
 }
 
-function calculateAlgemeneHeffingskorting(totalGrossAnnualIncome, isAOWAge) {
-    if (isAOWAge) {
+function calculateAlgemeneHeffingskorting(totalGrossAnnualIncome, age) {
+    if (age >= 67) {
         // Berekening voor AOW-gerechtigden
         if (totalGrossAnnualIncome <= 24813) {
             return 1735;
@@ -185,8 +182,8 @@ function calculateAlgemeneHeffingskorting(totalGrossAnnualIncome, isAOWAge) {
     }
 }
 
-function calculateArbeidskorting(totalGrossAnnualIncome, isAOWAge) {
-    if (isAOWAge) {
+function calculateArbeidskorting(totalGrossAnnualIncome, age) {
+    if (age >= 67) {
         // Berekening voor AOW-gerechtigden
         if (totalGrossAnnualIncome < 11491) {
             return totalGrossAnnualIncome * 0.04346;
@@ -216,13 +213,15 @@ function calculateArbeidskorting(totalGrossAnnualIncome, isAOWAge) {
 }
 
 function calculateOuderenkorting(totalGrossAnnualIncome) {
-    const maxKorting = 2010;
-    const inkomensgrens = 44770;
+    const maxOuderenkorting = 1835; // 2023 value
+    const reductionThreshold = 38520;
+    const reductionRate = 0.15;
 
-    if (totalGrossAnnualIncome <= inkomensgrens) {
-        return maxKorting;
+    if (totalGrossAnnualIncome <= reductionThreshold) {
+        return maxOuderenkorting;
     } else {
-        return 0;
+        const reduction = Math.min((totalGrossAnnualIncome - reductionThreshold) * reductionRate, maxOuderenkorting);
+        return Math.max(maxOuderenkorting - reduction, 0);
     }
 }
 
@@ -356,10 +355,10 @@ function calculate() {
 
     let salaries;
     if (calculationType === 'brutoToNetto') {
-        salaries = calculateNetSalary(salaryValue);
+        salaries = calculateNetSalary(salaryValue, true, age);
     } else {
-        const brutoSalary = calculateBrutoFromNetto(salaryValue);
-        salaries = calculateNetSalary(brutoSalary);
+        const brutoSalary = calculateBrutoFromNetto(salaryValue, true, age);
+        salaries = calculateNetSalary(brutoSalary, true, age);
     }
 
     displayResults(salaries, frequency);
@@ -412,7 +411,7 @@ function initializeChart() {
     });
 }
 
-function calculateBrutoFromNetto(netMonthlySalary, applyTaxCredit = true) {
+function calculateBrutoFromNetto(netMonthlySalary, applyTaxCredit = true, age = 30) {
     // Begin met een schatting van het bruto salaris
     let estimatedGrossMonthly = netMonthlySalary * 1.3; // Verhoog met 30% als startpunt
 
@@ -423,7 +422,7 @@ function calculateBrutoFromNetto(netMonthlySalary, applyTaxCredit = true) {
 
     // Gebruik een iteratieve benadering om het bruto salaris te vinden
     while (Math.abs(calculatedNetSalary - netMonthlySalary) > tolerance && iterationCount < maxIterations) {
-        const salaries = calculateNetSalary(estimatedGrossMonthly, applyTaxCredit);
+        const salaries = calculateNetSalary(estimatedGrossMonthly, applyTaxCredit, age);
         calculatedNetSalary = salaries.monthlyNetSalary;
 
         // Pas de schatting aan op basis van het verschil
