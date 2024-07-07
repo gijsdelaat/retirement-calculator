@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="nl">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>SpaarSlim</title>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="css/styles.css">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <script src="js/header.js"></script>
+        <script src="js/footer.js"></script>
+    </head>
+<body>
+    <header id="header-placeholder"></header>
+    <div class="container">
+        <div class="content">
+            <div class="calculator">
+                <h1>Box 3 Sparen</h1>
+                <label for="startAmount">Startbedrag: <span class="tooltip" title="Het bedrag waarmee je begint te sparen. Bijvoorbeeld, als je al €15.000 hebt gespaard, vul je hier €15.000 in.">ℹ️</span></label>
+                <div class="input-container">
+                    <span>€</span>
+                    <input type="number" id="startAmount" value="2000" step="500">
+                </div>
+
+                <label for="annualContribution">Bijdrage: <span class="tooltip" title="Het bedrag dat je jaarlijks of maandelijks bijdraagt aan je spaargeld. Bijvoorbeeld, als je elk jaar €18.000 bijdraagt, vul je hier €18.000 in.">ℹ️</span></label>
+                <div class="input-toggle-container">
+                    <div class="input-container small-input">
+                        <span>€</span>
+                        <input type="number" id="annualContribution" value="200" step="100">
+                    </div>
+                    <div class="toggle-buttons">
+                        <button id="annualToggle"  onclick="toggleFrequency(this, 'contribution')">Jaarlijks</button>
+                        <button id="monthlyToggle" class="active" onclick="toggleFrequency(this, 'contribution')">Maandelijks</button>
+                    </div>
+                </div>
+
+                <label for="annualReturn">Jaarlijks rendement: <span class="tooltip" title="Het percentage rendement dat je jaarlijks verwacht te behalen op je spaargeld.">ℹ️</span></label>
+                <div class="slider-container">
+                    <input type="range" id="annualReturn" min="0" max="20" step="1" value="7" class="slider">
+                    <span id="annualReturnDisplay">7%</span>
+                </div>
+
+                <label for="savingsDuration">Spaarduur in jaren:</label>
+                <div class="slider-container">
+                    <input type="range" id="savingsDuration" min="1" max="50" step="1" value="10" class="slider">
+                    <span id="savingsDurationDisplay">10</span>
+                </div>
+
+                <label for="fiscalPartner">Fiscaal partner: <span class="tooltip" title="Vink dit aan als je een fiscaal partner hebt. Dit verdubbelt de vermogensvrijstelling.">ℹ️</span></label>
+                <input type="checkbox" id="fiscalPartner">
+                
+            </div>
+
+            <div class="chart-container">
+                <div class="estimated-withdrawal-container">
+                    <h2>Totaal Vermogen na Spaarduur:</h2>
+                    <p id="estimatedTotalDisplay">€0</p>
+                </div>
+                
+                
+                <div style="height: 400px;">
+                    <canvas id="savingsChart"></canvas>
+                </div>
+        
+                <h2>Overzicht</h2>
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>Jaar</th>
+                            <th>Spaargeld (€)</th>
+                            <th>Jaarlijks Rendement (€) <span class="tooltip" title="Dit is het bedrag dat je dat jaar verdient aan rendement op je spaargeld en beleggingen.">ℹ️</span></th>
+                            <th>Box 3 Belasting (€)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dynamische data komt hier -->
+                    </tbody>
+                </table>
+            </div>
+            </div>
+        </div>
+    </div>
+    <footer id="footer-placeholder"></footer>
+    <script src="js/script.js"></script>
+</body>
+
+</html>
