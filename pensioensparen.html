@@ -11,22 +11,11 @@
     <script src="js/bruto_netto.js"></script>
     <script src="js/pensionscript.js"></script>
     <script src="js/incomeChart.js"></script>
+    <script src="js/header.js"></script>
+    <script src="js/footer.js"></script>
 </head>
 <body>
-    <header>
-        <div class="logo" style="display: flex; align-items: center;">
-            <img src="https://i.ibb.co/DR1gbRK/DALL-E-2024-05-27-14-37-17-A-clean-simple-and-serious-logo-for-a-financial-planning-business-featuri.png" alt="Logo" style="height: 50px; margin-right: 10px;">
-            <h1>SpaarSlim</h1>
-        </div>
-        <nav>
-            <ul>
-                <li><a href="index.html"><i class="fas fa-piggy-bank"></i> Box 3 Sparen</a></li>
-                <li><a href="pensioensparen.html" class="active"><i class="fas fa-chart-line"></i> Pensioensparen</a></li>
-                <li><a href="bruto_netto.html"><i class="fas fa-exchange-alt"></i> Netto/Bruto Salaris Omrekenen</a></li>
-
-            </ul>
-        </nav>
-    </header>
+    <header id="header-placeholder"></header>
     <div class="container">
         <div class="content">
             <div class="calculator">
@@ -55,7 +44,7 @@
                         <button id="monthlyToggle" onclick="toggleFrequency(this, 'contribution')">Maandelijks</button>
                     </div>
                 </div>
-                <label for="annualReturn">Jaarlijks rendement (%): <span class="tooltip" title="Het percentage rendement dat je jaarlijks verwacht te behalen op je pensioen/spaargeld.">ℹ️</span></label>
+                <label for="annualReturn">Jaarlijks rendement: <span class="tooltip" title="Het percentage rendement dat je jaarlijks verwacht te behalen op je pensioen/spaargeld.">ℹ️</span></label>
                 <div class="slider-container">
                     <input type="range" id="annualReturn" min="0" max="10" step="1" value="7" class="slider">
                     <span id="annualReturnDisplay">7%</span>
@@ -120,6 +109,6 @@
             </div>
         </div>
     </div>
-    
+    <footer id="footer-placeholder"></footer>
 </body>
 </html>

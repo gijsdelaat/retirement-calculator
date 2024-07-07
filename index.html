@@ -1,98 +1,47 @@
 <!DOCTYPE html>
 <html lang="nl">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>SpaarSlim</title>
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="css/styles.css">
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpaarSlim - Financiële Calculators</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="js/header.js"></script>
+    <script src="js/footer.js"></script>
+</head>
 <body>
-    <header>
-        <div class="logo" style="display: flex; align-items: center;">
-            <img src="https://i.ibb.co/DR1gbRK/DALL-E-2024-05-27-14-37-17-A-clean-simple-and-serious-logo-for-a-financial-planning-business-featuri.png" alt="Logo" style="height: 50px; margin-right: 10px;">
-            <h1>SpaarSlim</h1>
-        </div>
-        <nav>
-            <ul>
-                <li><a href="index.html" class="active"><i class="fas fa-piggy-bank"></i> Box 3 Sparen</a></li>
-                <li><a href="pensioensparen.html"><i class="fas fa-chart-line"></i> Pensioensparen</a></li>
-                <li><a href="bruto_netto.html"><i class="fas fa-exchange-alt"></i> Netto/Bruto Salaris Omrekenen</a></li>
-                
-            </ul>
-        </nav>
-    </header>
+    <header id="header-placeholder"></header>
     <div class="container">
         <div class="content">
-            <div class="calculator">
-                <h1>Box 3 Sparen</h1>
-                <label for="startAmount">Startbedrag: <span class="tooltip" title="Het bedrag waarmee je begint te sparen. Bijvoorbeeld, als je al €15.000 hebt gespaard, vul je hier €15.000 in.">ℹ️</span></label>
-                <div class="input-container">
-                    <span>€</span>
-                    <input type="number" id="startAmount" value="2000" step="500">
-                </div>
-
-                <label for="annualContribution">Bijdrage: <span class="tooltip" title="Het bedrag dat je jaarlijks of maandelijks bijdraagt aan je spaargeld. Bijvoorbeeld, als je elk jaar €18.000 bijdraagt, vul je hier €18.000 in.">ℹ️</span></label>
-                <div class="input-toggle-container">
-                    <div class="input-container small-input">
-                        <span>€</span>
-                        <input type="number" id="annualContribution" value="2400" step="100">
-                    </div>
-                    <div class="toggle-buttons">
-                        <button id="annualToggle" class="active" onclick="toggleFrequency(this, 'contribution')">Jaarlijks</button>
-                        <button id="monthlyToggle" onclick="toggleFrequency(this, 'contribution')">Maandelijks</button>
-                    </div>
-                </div>
-
-                <label for="annualReturn">Jaarlijks rendement (%): <span class="tooltip" title="Het percentage rendement dat je jaarlijks verwacht te behalen op je spaargeld.">ℹ️</span></label>
-                <div class="slider-container">
-                    <input type="range" id="annualReturn" min="0" max="20" step="1" value="8" class="slider">
-                    <span id="annualReturnDisplay">8%</span>
-                </div>
-
-                <label for="savingsDuration">Spaarduur (jaren):</label>
-                <div class="slider-container">
-                    <input type="range" id="savingsDuration" min="1" max="50" step="1" value="35" class="slider">
-                    <span id="savingsDurationDisplay">35</span>
-                </div>
-
-                <label for="fiscalPartner">Fiscaal partner: <span class="tooltip" title="Vink dit aan als je een fiscaal partner hebt. Dit verdubbelt de vermogensvrijstelling.">ℹ️</span></label>
-                <input type="checkbox" id="fiscalPartner">
-                
+            <h1>Welkom bij SpaarSlim</h1>
+            <p>SpaarSlim biedt u handige financiële calculators om uw financiële planning te ondersteunen. Kies een van onze calculators hieronder:</p>
+            
+            <div class="calculator-options">
+                <a href="box3sparen.html" class="calculator-option">
+                    <i class="fas fa-piggy-bank"></i>
+                    <h2>Box 3 Sparen</h2>
+                    <p>Bereken uw spaargeld en rendement in Box 3</p>
+                </a>
+                <a href="pensioensparen.html" class="calculator-option">
+                    <i class="fas fa-chart-line"></i>
+                    <h2>Pensioensparen</h2>
+                    <p>Plan uw pensioen en bereken uw pensioeninkomen</p>
+                </a>
+                <a href="bruto_netto.html" class="calculator-option">
+                    <i class="fas fa-exchange-alt"></i>
+                    <h2>Bruto/Netto Salaris</h2>
+                    <p>Bereken uw netto salaris of bruto salaris</p>
+                </a>
             </div>
 
-            <div class="chart-container">
-                <div class="estimated-withdrawal-container">
-                    <h2>Totaal Vermogen na Spaarduur:</h2>
-                    <p id="estimatedTotalDisplay">€0</p>
-                </div>
-                
-                
-                <div style="height: 400px;">
-                    <canvas id="savingsChart"></canvas>
-                </div>
-        
-                <h2>Overzicht</h2>
-                <table id="dataTable">
-                    <thead>
-                        <tr>
-                            <th>Jaar</th>
-                            <th>Spaargeld (€)</th>
-                            <th>Jaarlijks Rendement (€) <span class="tooltip" title="Dit is het bedrag dat je dat jaar verdient aan rendement op je spaargeld en beleggingen.">ℹ️</span></th>
-                            <th>Box 3 Belasting (€)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Dynamische data komt hier -->
-                    </tbody>
-                </table>
-            </div>
+            <div class="about-section">
+                <h2>Over SpaarSlim</h2>
+                <p>SpaarSlim is uw betrouwbare partner voor financiële planning. Onze calculators helpen u bij het maken van weloverwogen financiële beslissingen, of het nu gaat om sparen, pensioenplanning of salarisberekeningen.</p>
+                <p>Gebruik onze tools om uw financiële toekomst in kaart te brengen en uw doelen te bereiken.</p>
             </div>
         </div>
     </div>
-    <script src="js/script.js"></script>
+    <footer id="footer-placeholder"></footer>
 </body>
-
 </html>
