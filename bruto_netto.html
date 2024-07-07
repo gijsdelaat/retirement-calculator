@@ -28,8 +28,8 @@
                     <input type="number" id="salary" value="3000" step="100" oninput="calculate()">
                 </div>
                 <div class="toggle-buttons">
-                    <button id="monthlyToggle" class="active" onclick="toggleFrequency(this, 'monthly')">Toon Maandelijks</button>
-                    <button id="annualToggle" onclick="toggleFrequency(this, 'annual')">Toon Jaarlijks</button>
+                    <button id="monthlyToggle" class="active" onclick="toggleFrequency(this, 'salary')">Toon Maandelijks</button>
+                    <button id="annualToggle" onclick="toggleFrequency(this, 'salary')">Toon Jaarlijks</button>
                 </div>
                 <div class="input-group">
                     <label for="vacationMoney">Vakantiegeld: <span class="tooltip" title="Vakantiegeld is meestal 8% van je bruto jaarsalaris.">ℹ️</span></label>
@@ -43,9 +43,14 @@
                     <label for="age">Leeftijd:</label>
                     <input type="number" id="age" value="30" step="1" oninput="calculate()">
                 </div>
-                <div class="input-group">
-                    <label for="pensionContribution">Jaarlijkse Pensioenbijdrage:</label>
-                    <input type="number" id="pensionContribution" value="0" step="100" oninput="calculate()">
+                <label for="pensionContribution">Pensioenbijdrage: <span class="tooltip" title="Het bedrag dat je bijdraagt aan je pensioen.">ℹ️</span></label>
+                <div class="input-container">
+                    <span>€</span>
+                    <input type="number" id="pensionContribution" value="250" step="10" oninput="calculate()">
+                </div>
+                <div class="toggle-buttons">
+                    <button id="monthlyContributionToggle" class="active" onclick="toggleFrequency(this, 'contribution')">Toon Maandelijks</button>
+                    <button id="annualContributionToggle" onclick="toggleFrequency(this, 'contribution')">Toon Jaarlijks</button>
                 </div>
             </div>
             

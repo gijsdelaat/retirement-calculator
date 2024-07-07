@@ -29,6 +29,10 @@ function setupEventListeners() {
             toggleFrequency(event.target, event.target.closest('.input-toggle-container').querySelector('input').id === 'annualContribution' ? 'contribution' : 'salary');
         });
     });
+
+    document.getElementById('annualContribution').addEventListener('input', calculateAndUpdateIncomeChart);
+    document.getElementById('monthlyToggle').addEventListener('click', calculateAndUpdateIncomeChart);
+    document.getElementById('annualToggle').addEventListener('click', calculateAndUpdateIncomeChart);
 }
 
 function initializeCollapsibles() {
@@ -282,6 +286,10 @@ function calculateAndUpdateIncomeChart() {
     const withdrawalEstimate = parseFloat(document.getElementById('estimatedWithdrawalDisplay').textContent.replace(/[^0-9.-]+/g,"")) || 0;
     const incomeGrowth = parseFloat(document.getElementById('incomeGrowth').value) / 100 || 0.02;
 
+    // Get pension contribution from pensioensparen page
+    const pensionContribution = parseFloat(document.getElementById('annualContribution').value) || 0;
+    const pensionFrequency = document.getElementById('monthlyToggle').classList.contains('active') ? 'monthly' : 'annual';
+
     const AOWLeeftijd = 67; // Fixed AOW age
     const AOWStartAmount = 13200; // Starting AOW amount
     const AOWGrowthRate = 0.02; // 2% annual growth for AOW
@@ -303,7 +311,8 @@ function calculateAndUpdateIncomeChart() {
         if (i < jarenTotPensioen) {
             // Before retirement
             grossIncomeData.push(currentIncome);
-            const netSalary = calculateNetSalary(currentIncome / 12, true, currentAge, isAOWAge).annualNetSalary;
+            const annualPensionContribution = pensionFrequency === 'monthly' ? pensionContribution * 12 : pensionContribution;
+            const netSalary = calculateNetSalary(currentIncome, 'annual', true, currentAge, annualPensionContribution, 'annual').annualNetSalary;
             netIncomeData.push(netSalary);
             aowData.push(0);
         } else {
@@ -311,13 +320,10 @@ function calculateAndUpdateIncomeChart() {
             const aowAmount = isAOWAge ? currentAOW : 0;
             const grossIncomeWithAOW = withdrawalEstimate * 12 + aowAmount;
             grossIncomeData.push(grossIncomeWithAOW);
-            const netSalary = calculateNetSalary(grossIncomeWithAOW / 12, true, currentAge, isAOWAge).annualNetSalary;
+            const netSalary = calculateNetSalary(grossIncomeWithAOW, 'annual', true, currentAge, 0, 'annual').annualNetSalary;
             netIncomeData.push(netSalary);
             aowData.push(aowAmount);
         }
-        
-        console.log(`Age: ${currentAge}, Gross Income: €${grossIncomeData[i].toFixed(2)}, Net Income: €${netIncomeData[i].toFixed(2)}, AOW: €${aowData[i].toFixed(2)}`);
-        console.log(`Tax details: `, calculateNetSalary(grossIncomeData[i] / 12, true, currentAge, isAOWAge));
         
         // Apply income growth
         currentIncome *= (1 + incomeGrowth);
@@ -338,3 +344,4 @@ function calculate() {
     console.log('Calculating pension data');
     berekenPensioensparen();
 }
+

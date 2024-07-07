@@ -20,10 +20,16 @@ function attachEventListeners() {
 }
 
 function toggleFrequency(button, type) {
-    salaryFrequency = type;
-    document.getElementById('monthlyToggle').classList.remove('active');
-    document.getElementById('annualToggle').classList.remove('active');
-    button.classList.add('active');
+    if (type === 'contribution') {
+        document.getElementById('annualContributionToggle').classList.remove('active');
+        document.getElementById('monthlyContributionToggle').classList.remove('active');
+        button.classList.add('active');
+        updateContributionInput();
+    } else if (type === 'salary') {
+        document.getElementById('monthlyToggle').classList.remove('active');
+        document.getElementById('annualToggle').classList.remove('active');
+        button.classList.add('active');
+    }
     calculate();
 }
 
@@ -88,8 +94,13 @@ function swapCalculation() {
 
 
 
-function calculateNetSalary(grossMonthlySalary, applyTaxCredit = true, age = 30, annualPensionContribution = 0) {
-    const grossAnnualSalary = grossMonthlySalary * 12;
+function calculateNetSalary(salary, frequency = 'monthly', applyTaxCredit = true, age = 30, pensionContribution = 0, pensionFrequency = 'monthly') {
+    // Convert salary to annual if it's monthly
+    const grossAnnualSalary = frequency === 'monthly' ? salary * 12 : salary;
+
+    // Convert pension contribution to annual if it's monthly
+    const annualPensionContribution = pensionFrequency === 'monthly' ? pensionContribution * 12 : pensionContribution;
+
     const vacationMoneyCheckbox = document.getElementById('vacationMoney');
     const thirteenthMonthCheckbox = document.getElementById('thirteenthMonth');
     
@@ -97,10 +108,10 @@ function calculateNetSalary(grossMonthlySalary, applyTaxCredit = true, age = 30,
     const thirteenthMonthEnabled = thirteenthMonthCheckbox ? thirteenthMonthCheckbox.checked : false;
 
     const vacationMoney = vacationMoneyEnabled ? grossAnnualSalary * 0.08 : 0;
-    const thirteenthMonth = thirteenthMonthEnabled ? grossMonthlySalary : 0;
+    const thirteenthMonth = thirteenthMonthEnabled ? grossAnnualSalary / 12 : 0;
 
     const totalGrossAnnualIncome = grossAnnualSalary + vacationMoney + thirteenthMonth;
-    const taxableIncome = totalGrossAnnualIncome - annualPensionContribution; // Deduct the pension contribution before taxes
+    const taxableIncome = totalGrossAnnualIncome - annualPensionContribution;
 
     const taxAmount = calculateTax(taxableIncome, age);
 
@@ -117,15 +128,17 @@ function calculateNetSalary(grossMonthlySalary, applyTaxCredit = true, age = 30,
     return {
         monthlyNetSalary: netMonthlySalary,
         annualNetSalary: netAnnualSalary,
-        grossMonthlySalary: grossMonthlySalary,
+        grossMonthlySalary: grossAnnualSalary / 12,
         grossAnnualSalary: totalGrossAnnualIncome,
+        taxableIncome: taxableIncome,
         taxAmount: taxAmount,
         effectiveTaxAmount: effectiveTaxAmount,
         vacationMoney: vacationMoney,
         thirteenthMonth: thirteenthMonth,
         algemeneHeffingskorting: algemeneHeffingskorting,
         arbeidskorting: arbeidskorting,
-        ouderenkorting: ouderenkorting
+        ouderenkorting: ouderenkorting,
+        annualPensionContribution: annualPensionContribution
     };
 }
 
@@ -221,17 +234,19 @@ function calculateOuderenkorting(totalGrossAnnualIncome) {
     }
 }
 
-function displayResults(salaries, frequency, annualPensionContribution) {
+function displayResults(salaries, salaryFrequency, pensionContribution, pensionFrequency) {
     const table = document.getElementById('resultsTable');
     table.innerHTML = ''; // Clear existing content
 
     const isAOWAge = parseInt(document.getElementById('age').value) >= 67;
 
-    const factor = frequency === 'monthly' ? 12 : 1;
+    const factor = salaryFrequency === 'monthly' ? 12 : 1;
+    const pensionFactor = pensionFrequency === 'monthly' ? 12 : 1;
 
     const rows = [
         { label: 'Bruto salaris', value: salaries.grossAnnualSalary / factor },
-        { label: 'Pensioenbijdrage', value: -annualPensionContribution / factor, isNegative: true },
+        { label: 'Pensioenbijdrage', value: -salaries.annualPensionContribution / pensionFactor, isNegative: true },
+        { label: 'Belastbaar inkomen', value: salaries.taxableIncome / factor },
         { label: 'Loonheffing', value: -salaries.taxAmount / factor, isNegative: true },
         { label: 'Totaal heffingskortingen:', value: 0, isSubheader: true },
         { label: '- Algemene heffingskorting', value: salaries.algemeneHeffingskorting / factor, indent: true },
@@ -270,7 +285,7 @@ function displayResults(salaries, frequency, annualPensionContribution) {
         table.appendChild(tr);
     });
 
-    updateChart(salaries, frequency);
+    updateChart(salaries, salaryFrequency);
     updateSummary(); // Call this after updating the chart
 }
 
@@ -343,31 +358,50 @@ function updateResultsSummary() {
 }
 
 function calculate() {
-    const salaryInput = document.getElementById('salary');
-    const salaryValue = salaryInput ? parseFloat(salaryInput.value) || 0 : 0;
-    const frequencyButton = document.querySelector('.toggle-buttons .active');
-    const frequency = frequencyButton ? (frequencyButton.id === 'monthlyToggle' ? 'monthly' : 'annual') : 'monthly';
-    const ageInput = document.getElementById('age');
-    const age = ageInput ? parseInt(ageInput.value) || 0 : 0;
-    const pensionContributionInput = document.getElementById('pensionContribution');
-    const annualPensionContribution = pensionContributionInput ? parseFloat(pensionContributionInput.value) || 0 : 0;
+    const salary = parseFloat(document.getElementById('salary').value);
+    const salaryFrequency = document.querySelector('.toggle-buttons .active').id === 'monthlyToggle' ? 'monthly' : 'annual';
+    const age = parseInt(document.getElementById('age').value);
+    const pensionContribution = parseFloat(document.getElementById('pensionContribution').value) || 0;
+    const pensionFrequency = document.getElementById('monthlyContributionToggle').classList.contains('active') ? 'monthly' : 'annual';
 
     let salaries;
     if (calculationType === 'brutoToNetto') {
-        salaries = calculateNetSalary(salaryValue, true, age, annualPensionContribution);
+        salaries = calculateNetSalary(salary, salaryFrequency, true, age, pensionContribution, pensionFrequency);
     } else {
-        const brutoSalary = calculateBrutoFromNetto(salaryValue, true, age);
-        salaries = calculateNetSalary(brutoSalary, true, age, annualPensionContribution);
+        const brutoSalary = calculateBrutoFromNetto(salary, salaryFrequency);
+        salaries = calculateNetSalary(brutoSalary, salaryFrequency, true, age, pensionContribution, pensionFrequency);
     }
 
-    displayResults(salaries, frequency, annualPensionContribution);
+    displayResults(salaries, salaryFrequency, pensionContribution, pensionFrequency);
     updateSummary();
 }
 
 function toggleFrequency(button, type) {
-    document.querySelectorAll('.toggle-buttons button').forEach(btn => btn.classList.remove('active'));
-    button.classList.add('active');
+    if (type === 'contribution') {
+        document.getElementById('annualContributionToggle').classList.remove('active');
+        document.getElementById('monthlyContributionToggle').classList.remove('active');
+        button.classList.add('active');
+        updateContributionInput();
+    } else if (type === 'salary') {
+        document.getElementById('monthlyToggle').classList.remove('active');
+        document.getElementById('annualToggle').classList.remove('active');
+        button.classList.add('active');
+    }
     calculate();
+}
+
+function updateContributionInput() {
+    const input = document.getElementById('pensionContribution');
+    const isMonthly = document.getElementById('monthlyContributionToggle').classList.contains('active');
+    const currentValue = parseFloat(input.value);
+
+    if (isMonthly) {
+        input.value = (currentValue / 12).toFixed(2);
+        input.step = "10";
+    } else {
+        input.value = (currentValue * 12).toFixed(2);
+        input.step = "100";
+    }
 }
 
 let taxPieChartInstance; // Global variable to store the chart instance
@@ -410,7 +444,7 @@ function initializeChart() {
     });
 }
 
-function calculateBrutoFromNetto(netMonthlySalary, applyTaxCredit = true, age = 30) {
+function calculateBrutoFromNetto(netMonthlySalary, frequency = 'monthly') {
     // Begin met een schatting van het bruto salaris
     let estimatedGrossMonthly = netMonthlySalary * 1.3; // Verhoog met 30% als startpunt
 
@@ -421,7 +455,7 @@ function calculateBrutoFromNetto(netMonthlySalary, applyTaxCredit = true, age = 
 
     // Gebruik een iteratieve benadering om het bruto salaris te vinden
     while (Math.abs(calculatedNetSalary - netMonthlySalary) > tolerance && iterationCount < maxIterations) {
-        const salaries = calculateNetSalary(estimatedGrossMonthly, applyTaxCredit, age);
+        const salaries = calculateNetSalary(estimatedGrossMonthly, frequency);
         calculatedNetSalary = salaries.monthlyNetSalary;
 
         // Pas de schatting aan op basis van het verschil
