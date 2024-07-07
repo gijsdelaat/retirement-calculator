@@ -242,7 +242,7 @@ function customPensioensparenTooltip(context) {
             <div class="tooltip-body">
                 <div class="tooltip-row">
                     <span class="label">Pensioen:</span>
-                    <span class="value">${formatNumber(pensionData)}</span>
+                    <span class="value">€${pensionData.toFixed(2)}</span>
                 </div>
             </div>
         `;
