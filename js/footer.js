@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     <i class="fas fa-envelope"></i> Contact
                 </a>
             </div>
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2645932518176941"
+     crossorigin="anonymous"></script>
         </footer>
     `;
     
