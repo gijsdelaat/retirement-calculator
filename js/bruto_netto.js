@@ -221,7 +221,7 @@ function calculateOuderenkorting(totalGrossAnnualIncome) {
     }
 }
 
-function displayResults(salaries, frequency) {
+function displayResults(salaries, frequency, annualPensionContribution) {
     const table = document.getElementById('resultsTable');
     table.innerHTML = ''; // Clear existing content
 
@@ -349,16 +349,18 @@ function calculate() {
     const frequency = frequencyButton ? (frequencyButton.id === 'monthlyToggle' ? 'monthly' : 'annual') : 'monthly';
     const ageInput = document.getElementById('age');
     const age = ageInput ? parseInt(ageInput.value) || 0 : 0;
+    const pensionContributionInput = document.getElementById('pensionContribution');
+    const annualPensionContribution = pensionContributionInput ? parseFloat(pensionContributionInput.value) || 0 : 0;
 
     let salaries;
     if (calculationType === 'brutoToNetto') {
-        salaries = calculateNetSalary(salaryValue, true, age);
+        salaries = calculateNetSalary(salaryValue, true, age, annualPensionContribution);
     } else {
         const brutoSalary = calculateBrutoFromNetto(salaryValue, true, age);
-        salaries = calculateNetSalary(brutoSalary, true, age);
+        salaries = calculateNetSalary(brutoSalary, true, age, annualPensionContribution);
     }
 
-    displayResults(salaries, frequency);
+    displayResults(salaries, frequency, annualPensionContribution);
     updateSummary();
 }
 
