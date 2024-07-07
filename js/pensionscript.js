@@ -166,7 +166,7 @@ function berekenPensioensparen() {
                     tooltip: {
                         enabled: false,
                         position: 'nearest',
-                        external: customTooltip
+                        external: customPensioensparenTooltip
                     },
                     legend: {
                         display: false
@@ -218,74 +218,43 @@ function toggleFrequency(button, type) {
     berekenPensioensparen();
 }
 
-function customTooltip(context) {
-    // Tooltip Element
-    let tooltipEl = document.getElementById('chartjs-tooltip');
+function customPensioensparenTooltip(context) {
+    if (!context || !context.chart || !context.tooltip) return;
 
-    // Create element on first render
-    if (!tooltipEl) {
-        tooltipEl = document.createElement('div');
-        tooltipEl.id = 'chartjs-tooltip';
-        tooltipEl.innerHTML = '<table></table>';
-        document.body.appendChild(tooltipEl);
-    }
+    const chart = context.chart;
+    const tooltip = context.tooltip;
+    const tooltipEl = getOrCreateTooltip(chart);
 
-    // Hide if no tooltip
-    const tooltipModel = context.tooltip;
-    if (tooltipModel.opacity === 0) {
+    if (tooltip.opacity === 0) {
         tooltipEl.style.opacity = 0;
         return;
     }
 
-    // Set caret Position
-    tooltipEl.classList.remove('above', 'below', 'no-transform');
-    if (tooltipModel.yAlign) {
-        tooltipEl.classList.add(tooltipModel.yAlign);
-    } else {
-        tooltipEl.classList.add('no-transform');
+    if (tooltip.body) {
+        const titleLines = tooltip.title || [];
+        const bodyLines = tooltip.body.map(b => b.lines);
+
+        // Example of extracting data, adjust according to actual data structure
+        const pensionData = parseFloat(bodyLines[0][0].split(': ')[1].replace(/[^0-9.-]+/g,"")) || 0;
+
+        const tooltipContent = `
+            <div class="tooltip-header">Leeftijd: ${titleLines[0]}</div>
+            <div class="tooltip-body">
+                <div class="tooltip-row">
+                    <span class="label">Pensioen:</span>
+                    <span class="value">€${pensionData.toFixed(2)}</span>
+                </div>
+            </div>
+        `;
+
+        tooltipEl.innerHTML = tooltipContent;
     }
 
-    function getBody(bodyItem) {
-        return bodyItem.lines;
-    }
-
-    // Set Text
-    if (tooltipModel.body) {
-        const titleLines = tooltipModel.title || [];
-        const bodyLines = tooltipModel.body.map(getBody);
-
-        let innerHtml = '<thead>';
-
-        titleLines.forEach(function(title) {
-            innerHtml += '<tr><th>' + title + '</th></tr>';
-        });
-        innerHtml += '</thead><tbody>';
-
-        bodyLines.forEach(function(body, i) {
-            const colors = tooltipModel.labelColors[i];
-            let style = 'background:' + colors.backgroundColor;
-            style += '; border-color:' + colors.borderColor;
-            style += '; border-width: 2px';
-            const span = '<span style="' + style + '"></span>';
-            innerHtml += '<tr><td>' + span + body + '</td></tr>';
-        });
-        innerHtml += '</tbody>';
-
-        let tableRoot = tooltipEl.querySelector('table');
-        tableRoot.innerHTML = innerHtml;
-    }
-
-    const position = context.chart.canvas.getBoundingClientRect();
-    const bodyFont = Chart.helpers.toFont(tooltipModel.options.bodyFont);
-
-    // Display, position, and set styles for font
+    const position = chart.canvas.getBoundingClientRect();
     tooltipEl.style.opacity = 1;
     tooltipEl.style.position = 'absolute';
-    tooltipEl.style.left = position.left + window.pageXOffset + tooltipModel.caretX + 'px';
-    tooltipEl.style.top = position.top + window.pageYOffset + tooltipModel.caretY + 'px';
-    tooltipEl.style.font = bodyFont.string;
-    tooltipEl.style.padding = tooltipModel.padding + 'px ' + tooltipModel.padding + 'px';
-    tooltipEl.style.pointerEvents = 'none';
+    tooltipEl.style.left = position.left + window.pageXOffset + tooltip.caretX + 'px';
+    tooltipEl.style.top = position.top + window.pageYOffset + tooltip.caretY + 'px';
 }
 
 function getOrCreateTooltip(chart) {
@@ -369,4 +338,3 @@ function calculate() {
     console.log('Calculating pension data');
     berekenPensioensparen();
 }
-

@@ -42,17 +42,23 @@ function berekenBox3Sparen() {
     for (let i = 0; i < spaarduur; i++) {
         spaargeld += jaarlijkseBijdrage;
         cumulativeContributions += jaarlijkseBijdrage;
-        spaargeld *= (1 + jaarlijksRendement);
-        spaargeldData.push(spaargeld.toFixed(0));
-        contributionsData.push(cumulativeContributions.toFixed(0));
-        rendementData.push((spaargeld - cumulativeContributions).toFixed(0));
-
+        
         // Calculate Box 3 Belasting
         const taxableAmount = Math.max(spaargeld - taxFreeAllowance, 0);
         const savingsReturn = taxableAmount * 0.005;
         const investmentsReturn = taxableAmount * 0.0533;
         const netReturn = savingsReturn + investmentsReturn;
         const belasting = netReturn * taxRate;
+        
+        // Apply the tax before calculating the return
+        spaargeld -= belasting;
+        
+        // Calculate return after tax
+        spaargeld *= (1 + jaarlijksRendement);
+        
+        spaargeldData.push(spaargeld.toFixed(0));
+        contributionsData.push(cumulativeContributions.toFixed(0));
+        rendementData.push((spaargeld - cumulativeContributions).toFixed(0));
         belastingData.push(belasting.toFixed(0));
     }
 
