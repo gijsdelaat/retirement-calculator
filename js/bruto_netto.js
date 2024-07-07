@@ -88,7 +88,7 @@ function swapCalculation() {
 
 
 
-function calculateNetSalary(grossMonthlySalary, applyTaxCredit = true, age = 30) {
+function calculateNetSalary(grossMonthlySalary, applyTaxCredit = true, age = 30, annualPensionContribution = 0) {
     const grossAnnualSalary = grossMonthlySalary * 12;
     const vacationMoneyCheckbox = document.getElementById('vacationMoney');
     const thirteenthMonthCheckbox = document.getElementById('thirteenthMonth');
@@ -96,26 +96,22 @@ function calculateNetSalary(grossMonthlySalary, applyTaxCredit = true, age = 30)
     const vacationMoneyEnabled = vacationMoneyCheckbox ? vacationMoneyCheckbox.checked : false;
     const thirteenthMonthEnabled = thirteenthMonthCheckbox ? thirteenthMonthCheckbox.checked : false;
 
-    // Calculate vacation money and thirteenth month correctly
     const vacationMoney = vacationMoneyEnabled ? grossAnnualSalary * 0.08 : 0;
     const thirteenthMonth = thirteenthMonthEnabled ? grossMonthlySalary : 0;
 
-    // Correctly calculate the total gross annual income
     const totalGrossAnnualIncome = grossAnnualSalary + vacationMoney + thirteenthMonth;
+    const taxableIncome = totalGrossAnnualIncome - annualPensionContribution; // Deduct the pension contribution before taxes
 
-    // Calculate tax based on the total gross annual income
-    const taxAmount = calculateTax(totalGrossAnnualIncome, age);
+    const taxAmount = calculateTax(taxableIncome, age);
 
-    // Calculate tax credits
-    const algemeneHeffingskorting = calculateAlgemeneHeffingskorting(totalGrossAnnualIncome, age);
-    const arbeidskorting = calculateArbeidskorting(totalGrossAnnualIncome, age);
-    const ouderenkorting = age >= 67 ? calculateOuderenkorting(totalGrossAnnualIncome) : 0;
+    const algemeneHeffingskorting = calculateAlgemeneHeffingskorting(taxableIncome, age);
+    const arbeidskorting = calculateArbeidskorting(taxableIncome, age);
+    const ouderenkorting = age >= 67 ? calculateOuderenkorting(taxableIncome) : 0;
     const heffingskortingen = applyTaxCredit ? (algemeneHeffingskorting + arbeidskorting + ouderenkorting) : 0;
 
-    // Ensure that the applied tax credits don't exceed the tax amount
     const effectiveTaxAmount = Math.max(0, taxAmount - heffingskortingen);
 
-    const netAnnualSalary = totalGrossAnnualIncome - effectiveTaxAmount;
+    const netAnnualSalary = taxableIncome - effectiveTaxAmount;
     const netMonthlySalary = netAnnualSalary / 12;
 
     return {
@@ -235,6 +231,7 @@ function displayResults(salaries, frequency) {
 
     const rows = [
         { label: 'Bruto salaris', value: salaries.grossAnnualSalary / factor },
+        { label: 'Pensioenbijdrage', value: -annualPensionContribution / factor, isNegative: true },
         { label: 'Loonheffing', value: -salaries.taxAmount / factor, isNegative: true },
         { label: 'Totaal heffingskortingen:', value: 0, isSubheader: true },
         { label: '- Algemene heffingskorting', value: salaries.algemeneHeffingskorting / factor, indent: true },
@@ -249,7 +246,7 @@ function displayResults(salaries, frequency) {
     rows.push({ label: 'Totaal heffingskortingen', value: totalHeffingskortingen, isSubtotal: true });
 
     rows.push({ label: 'Effectieve loonheffing', value: -salaries.effectiveTaxAmount / factor, isNegative: true });
-    rows.push({ label: 'Netto salaris', value: salaries.annualNetSalary / factor, isTotal: true });
+    rows.push({ label: 'Netto besteedbaar inkomen', value: salaries.annualNetSalary / factor, isTotal: true });
 
     rows.forEach(row => {
         const tr = document.createElement('tr');
@@ -296,7 +293,7 @@ function updateChart(salaries, frequency) {
     taxPieChartInstance = new Chart(ctx, {
         type: 'pie',
         data: {
-            labels: ['Netto inkomen', 'Effectieve loonheffing'],
+            labels: ['Netto besteedbaar inkomen', 'Effectieve loonheffing'],
             datasets: [{
                 data: [netIncome, effectiveTaxAmount],
                 backgroundColor: ['#36a2eb', '#ff6384']
@@ -458,7 +455,7 @@ function updateSummary() {
 
     incomeSummaryElement.innerHTML = `
     <div class="summary-item"><strong>Bruto inkomen:</strong> €${grossIncome.toFixed(2)}</div>
-    <div class="summary-item"><strong>Netto inkomen:</strong> €${netIncome.toFixed(2)}</div>
+    <div class="summary-item"><strong>Netto besteedbaar inkomen:</strong> €${netIncome.toFixed(2)}</div>
     <div class="summary-item"><strong>Belasting:</strong> €${taxes.toFixed(2)}</div>
     <div class="summary-item"><strong>Belastingdruk:</strong> ${taxBurden.toFixed(2)}% van uw inkomen</div>
     `;

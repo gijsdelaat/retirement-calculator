@@ -98,7 +98,7 @@ header nav {
 header nav ul {
     list-style: none;
     display: flex;
-    gap: 40px; /* Increased spacing between items */
+    gap: 50px; /* Increased spacing between items */
     margin: 0;
     padding: 0;
 }
@@ -140,8 +140,8 @@ header nav ul li a i {
 .container {
     width: 100%; /* Ensure full width */
     max-width: 1400px;
-    margin: 80px auto 20px;
-    padding: 20px;
+    margin: 100px auto 20px; /* Increased vertical margin */
+    padding: 30px; /* Increased padding for better spacing inside */
     background-color: #fff;
     border-radius: 10px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
@@ -369,7 +369,7 @@ table, th, td {
 }
 
 th, td {
-    padding: 12px;
+    padding: 15px; /* Increased from 12px */
     text-align: left;
 }
 
@@ -436,7 +436,7 @@ tr:hover td {
     position: relative;
     cursor: pointer;
     color: #007bff;
-    margin-left: 5px;
+    margin-left: 10px; /* Increased from 5px for better visibility */
     font-size: 0.8em; /* Kleinere lettergrootte */
 }
 
@@ -479,10 +479,10 @@ input[type="checkbox"] {
     background-color: #007bff;;
     color: #fff;
     border: none;
-    padding: 10px 20px;
+    padding: 15px 25px; /* Increased padding for a larger clickable area */
     cursor: pointer;
     font-size: 16px;
-    margin: 0 10px;
+    margin: 0 15px; /* Increased spacing between buttons */
     display: flex;
     align-items: center;
 }

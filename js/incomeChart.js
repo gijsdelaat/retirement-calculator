@@ -57,9 +57,9 @@ function updateIncomeChart(labels, grossIncomeData, netIncomeData, aowData) {
                 tooltip: {
                     enabled: false,
                     position: 'nearest',
-                    external: customTooltip,
+                    external: customGrossIncomeTooltip,
                 },
-                legend: { display: true }
+                legend: { display: false }
             },
             hover: {
                 mode: 'nearest',
@@ -84,12 +84,11 @@ function updateIncomeChart(labels, grossIncomeData, netIncomeData, aowData) {
     }
 }
 
-function customTooltip(context) {
+function customGrossIncomeTooltip(context) {
     if (!context || !context.chart || !context.tooltip) return;
 
     const chart = context.chart;
     const tooltip = context.tooltip;
-
     const tooltipEl = getOrCreateTooltip(chart);
 
     if (tooltip.opacity === 0) {
@@ -112,16 +111,13 @@ function customTooltip(context) {
             netIncome = parseFloat(bodyLines[1][0].split(': ')[1].replace(/[^0-9.-]+/g,"")) || 0;
         }
 
-        // Safely access aowData
         const dataIndex = tooltip.dataPoints[0].dataIndex;
         if (chart.data.datasets[0].aowData && Array.isArray(chart.data.datasets[0].aowData)) {
             aow = chart.data.datasets[0].aowData[dataIndex] || 0;
         }
 
-        console.log(`Tooltip - Age: ${titleLines[0]}, Gross Income: €${grossIncome.toFixed(2)}, Net Income: €${netIncome.toFixed(2)}, AOW: €${aow.toFixed(2)}`);
-
         const tooltipContent = `
-            <div class="tooltip-header">${titleLines[0]}</div>
+            <div class="tooltip-header">Leeftijd: ${titleLines[0]}</div>
             <div class="tooltip-body">
                 <div class="tooltip-row">
                     <span class="label">Bruto Inkomen:</span>
@@ -144,9 +140,9 @@ function customTooltip(context) {
     }
 
     const position = chart.canvas.getBoundingClientRect();
-
     tooltipEl.style.opacity = 1;
     tooltipEl.style.position = 'absolute';
     tooltipEl.style.left = position.left + window.pageXOffset + tooltip.caretX + 'px';
     tooltipEl.style.top = position.top + window.pageYOffset + tooltip.caretY + 'px';
 }
+
