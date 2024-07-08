@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     initializeChart(); // Move this line here
     updateSalaryInputLabel();
     calculate();
-    attachEventListeners();
+    attachEventListeners(); // Ensure this runs after the DOM is fully loaded
 });
 
 

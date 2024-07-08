@@ -6,6 +6,15 @@ function updateIncomeChart(labels, grossIncomeData, netIncomeData, aowData) {
     const maxIncome = Math.max(...grossIncomeData, ...netIncomeData);
     const yAxisMax = Math.ceil(maxIncome * 1.2 / 10000) * 10000;
 
+    // Log the data being passed to the chart
+    console.log('Updating Income Chart with data:', {
+        labels,
+        grossIncomeData,
+        netIncomeData,
+        aowData,
+        yAxisMax
+    });
+
     const chartConfig = {
         type: 'line',
         data: {
@@ -98,17 +107,17 @@ function customGrossIncomeTooltip(context) {
 
     if (tooltip.body) {
         const titleLines = tooltip.title || [];
-        const bodyLines = tooltip.body.map(b => b.lines);
+        const dataPoints = tooltip.dataPoints;
 
         let grossIncome = 0;
         let netIncome = 0;
         let aow = 0;
 
-        if (bodyLines[0] && bodyLines[0][0]) {
-            grossIncome = parseFloat(bodyLines[0][0].split(': ')[1].replace(/[^0-9.-]+/g,"")) || 0;
+        if (dataPoints[0]) {
+            grossIncome = dataPoints[0].raw;
         }
-        if (bodyLines[1] && bodyLines[1][0]) {
-            netIncome = parseFloat(bodyLines[1][0].split(': ')[1].replace(/[^0-9.-]+/g,"")) || 0;
+        if (dataPoints[1]) {
+            netIncome = dataPoints[1].raw;
         }
 
         const dataIndex = tooltip.dataPoints[0].dataIndex;
@@ -116,26 +125,36 @@ function customGrossIncomeTooltip(context) {
             aow = chart.data.datasets[0].aowData[dataIndex] || 0;
         }
 
+        // Log the values to the console
+        console.log('Tooltip Data:', {
+            titleLines,
+            grossIncome,
+            netIncome,
+            aow,
+            dataIndex,
+            dataPoints,
+            tooltipDataPoints: tooltip.dataPoints
+        });
+
         const tooltipContent = `
             <div class="tooltip-header">Leeftijd: ${titleLines[0]}</div>
             <div class="tooltip-body">
                 <div class="tooltip-row">
                     <span class="label">Bruto Inkomen:</span>
-                    <span class="value">€${grossIncome.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".")}</span>
+                    <span class="value">${formatNumber(grossIncome)}</span>
                 </div>
                 ${aow > 0 ? `
                 <div class="tooltip-row">
                     <span class="label">waarvan AOW:</span>
-                    <span class="value">€${aow.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".")}</span>
+                    <span class="value">${formatNumber(aow)}</span>
                 </div>
                 ` : ''}
                 <div class="tooltip-row">
                     <span class="label">Netto Inkomen:</span>
-                    <span class="value">€${netIncome.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".")}</span>
+                    <span class="value">${formatNumber(netIncome)}</span>
                 </div>
             </div>
         `;
-
         tooltipEl.innerHTML = tooltipContent;
     }
 
@@ -145,4 +164,3 @@ function customGrossIncomeTooltip(context) {
     tooltipEl.style.left = position.left + window.pageXOffset + tooltip.caretX + 'px';
     tooltipEl.style.top = position.top + window.pageYOffset + tooltip.caretY + 'px';
 }
-

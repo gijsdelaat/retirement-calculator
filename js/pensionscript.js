@@ -156,7 +156,7 @@ function berekenPensioensparen() {
                     y: {
                         ticks: {
                             callback: function(value) {
-                                return '€' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                                return formatNumber(value);
                             },
                             beginAtZero: true
                         }
@@ -236,17 +236,17 @@ function customPensioensparenTooltip(context) {
 
     if (tooltip.body) {
         const titleLines = tooltip.title || [];
-        const bodyLines = tooltip.body.map(b => b.lines);
+        const dataPoints = tooltip.dataPoints;
 
-        // Example of extracting data, adjust according to actual data structure
-        const pensionData = parseFloat(bodyLines[0][0].split(': ')[1].replace(/[^0-9.-]+/g,"")) || 0;
+        // Extract pension data
+        const pensionData = dataPoints[0].raw;
 
         const tooltipContent = `
             <div class="tooltip-header">Leeftijd: ${titleLines[0]}</div>
             <div class="tooltip-body">
                 <div class="tooltip-row">
                     <span class="label">Pensioen:</span>
-                    <span class="value">€${pensionData.toFixed(2)}</span>
+                    <span class="value">${formatNumber(pensionData)}</span>
                 </div>
             </div>
         `;
@@ -336,7 +336,14 @@ function calculateAndUpdateIncomeChart() {
 
     const labels = Array.from({ length: totalYears }, (_, i) => leeftijd + i);
 
-    // Call the function from incomeChart.js and pass aowData
+    // Log the data before calling updateIncomeChart
+    console.log('Calculated Data for Income Chart:', {
+        labels,
+        grossIncomeData,
+        netIncomeData,
+        aowData
+    });
+
     updateIncomeChart(labels, grossIncomeData, netIncomeData, aowData);
 }
 
@@ -344,4 +351,3 @@ function calculate() {
     console.log('Calculating pension data');
     berekenPensioensparen();
 }
-
