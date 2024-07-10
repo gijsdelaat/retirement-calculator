@@ -18,7 +18,7 @@
             <div class="calculator">
                 <h1>Box 3 Sparen</h1>
                 <div class="info-box">
-                    <p><i class="fas fa-info-circle"></i> Deze berekening is gebaseerd op de box 3 belastingregels van 2024. Houd er rekening mee dat dit een inschatting is en dat belastingregels jaarlijks kunnen veranderen. Voor de meest actuele informatie, raadpleeg de <a href="https://www.belastingdienst.nl/wps/wcm/connect/nl/box-3/content/box-3-inkomen-op-voorlopige-aanslag-2024" target="_blank">officiële Belastingdienst website</a>.</p>
+
                 </div>
 
                 <label for="startAmount">Startbedrag: <span class="tooltip" title="Het bedrag waarmee je begint te sparen. Bijvoorbeeld, als je al €15.000 hebt gespaard, vul je hier €15.000 in.">ℹ️</span></label>
@@ -54,6 +54,14 @@
                 <label for="fiscalPartner">Fiscaal partner: <span class="tooltip" title="Vink dit aan als je een fiscaal partner hebt. Dit verdubbelt de vermogensvrijstelling.">ℹ️</span></label>
                 <input type="checkbox" id="fiscalPartner">
                 
+                <div style="margin-top: 30px;">
+                    <label>Belastingregels 2024</label>
+                    <div class="collapsible-content">
+                        <p>Deze berekening is gebaseerd op de box 3 belastingregels van 2024. Houd er rekening mee dat dit een inschatting is en dat belastingregels jaarlijks kunnen veranderen.</p>
+                        <p>Voor de meest actuele informatie, raadpleeg de <a href="https://www.belastingdienst.nl/wps/wcm/connect/nl/box-3/content/box-3-inkomen-op-voorlopige-aanslag-2024" target="_blank" rel="noopener">officiële Belastingdienst website</a>.</p>
+                        <!-- Hier kun je meer details over de belastingregels toevoegen -->
+                    </div>
+                </div>
             </div>
 
             <div class="chart-container">
@@ -61,7 +69,6 @@
                     <h2>Totaal Vermogen na Spaarduur:</h2>
                     <p id="estimatedTotalDisplay">€0</p>
                 </div>
-                
                 
                 <div style="height: 400px;">
                     <canvas id="savingsChart"></canvas>
@@ -81,7 +88,6 @@
                         <!-- Dynamische data komt hier -->
                     </tbody>
                 </table>
-            </div>
             </div>
         </div>
     </div>

@@ -299,44 +299,48 @@ function updateChart(salaries, frequency) {
     const effectiveTaxAmount = salaries.effectiveTaxAmount / factor;
     const netIncome = salaries.annualNetSalary / factor;
 
-    const ctx = document.getElementById('taxPieChart').getContext('2d');
-    
-    if (taxPieChartInstance) {
-        taxPieChartInstance.destroy();
-    }
-
-    taxPieChartInstance = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: ['Netto besteedbaar inkomen', 'Effectieve loonheffing'],
-            datasets: [{
-                data: [netIncome, effectiveTaxAmount],
-                backgroundColor: ['#36a2eb', '#ff6384']
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            let label = context.label || '';
-                            if (label) {
-                                label += ': ';
+    if (!taxPieChartInstance) {
+        const ctx = document.getElementById('taxPieChart').getContext('2d');
+        taxPieChartInstance = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Netto besteedbaar inkomen', 'Effectieve loonheffing'],
+                datasets: [{
+                    data: [netIncome, effectiveTaxAmount],
+                    backgroundColor: ['#36a2eb', '#ff6384']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += formatCurrency(context.parsed);
+                                }
+                                return label;
                             }
-                            if (context.parsed !== null) {
-                                label += formatCurrency(context.parsed);
-                            }
-                            return label;
                         }
                     }
+                },
+                animation: {
+                    duration: 500 // Adjust animation duration as needed
                 }
             }
-        }
-    });
+        });
+    } else {
+        // Update existing chart data
+        taxPieChartInstance.data.datasets[0].data = [netIncome, effectiveTaxAmount];
+        taxPieChartInstance.update();
+    }
 }
 
 let grossIncome, netIncome, inkomstenbelasting, arbeidskorting, algemeneHeffingskorting, isMonthly;

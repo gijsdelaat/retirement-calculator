@@ -303,3 +303,20 @@ function formatNumber(num) {
 // After creating the chart:
 chart.options.plugins.tooltip.enabled = false;
 chart.options.plugins.tooltip.external = customTooltip;
+
+document.addEventListener('DOMContentLoaded', function() {
+    const calculatorOptions = document.querySelectorAll('.calculator-option');
+    
+    calculatorOptions.forEach(option => {
+        const video = option.querySelector('video');
+        
+        option.addEventListener('mouseenter', () => {
+            video.play();
+        });
+        
+        option.addEventListener('mouseleave', () => {
+            video.pause();
+            video.currentTime = 0;
+        });
+    });
+});
