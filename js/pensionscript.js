@@ -33,6 +33,7 @@ function setupEventListeners() {
     document.getElementById('annualContribution').addEventListener('input', calculateAndUpdateIncomeChart);
     document.getElementById('monthlyToggle').addEventListener('click', calculateAndUpdateIncomeChart);
     document.getElementById('annualToggle').addEventListener('click', calculateAndUpdateIncomeChart);
+    document.getElementById('incomeGrowth').addEventListener('input', updateSliders);
 }
 
 function initializeCollapsibles() {
@@ -96,7 +97,7 @@ function berekenPensioensparen() {
     }
 
     let monthlyWithdrawal = withdrawalEstimate / 12;
-    document.getElementById('estimatedWithdrawalDisplay').textContent = `€${monthlyWithdrawal.toFixed(2)} per maand`;
+    document.getElementById('estimatedWithdrawalDisplay').textContent = `€${monthlyWithdrawal.toFixed(2)} bruto per maand`;
 
     let spaargeldTotPensioen = initieleInleg;
     let spaargeldData = [];
@@ -207,6 +208,7 @@ function updateSliders() {
     document.getElementById('retirementAgeDisplay').textContent = parseFloat(document.getElementById('retirementAge').value).toFixed(0);
     document.getElementById('ageDisplay').textContent = parseFloat(document.getElementById('age').value).toFixed(0);
     document.getElementById('lifeExpectancyDisplay').textContent = parseFloat(document.getElementById('lifeExpectancy').value).toFixed(0);
+    document.getElementById('incomeGrowthDisplay').textContent = `${parseFloat(document.getElementById('incomeGrowth').value).toFixed(0)}%`;
 }
 
 function toggleFrequency(button, type) {

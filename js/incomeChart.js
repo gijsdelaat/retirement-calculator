@@ -28,14 +28,24 @@ function updateIncomeChart(labels, grossIncomeData, netIncomeData, aowData) {
                 pointRadius: 0,
                 pointHoverRadius: 5,
                 fill: true,
-                tension: 0.4,
-                aowData: aowData
+                tension: 0.4
             },
             {
                 label: 'Netto Inkomen',
                 data: netIncomeData,
                 borderColor: 'rgba(54, 162, 235, 1)',
                 backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderWidth: 3,
+                pointRadius: 0,
+                pointHoverRadius: 5,
+                fill: true,
+                tension: 0.4
+            },
+            {
+                label: 'AOW',
+                data: aowData,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
                 borderWidth: 3,
                 pointRadius: 0,
                 pointHoverRadius: 5,
@@ -68,7 +78,7 @@ function updateIncomeChart(labels, grossIncomeData, netIncomeData, aowData) {
                     position: 'nearest',
                     external: customGrossIncomeTooltip,
                 },
-                legend: { display: false }
+                legend: { display: true }
             },
             hover: {
                 mode: 'nearest',
@@ -84,8 +94,8 @@ function updateIncomeChart(labels, grossIncomeData, netIncomeData, aowData) {
     if (incomeChart) {
         incomeChart.data.labels = labels;
         incomeChart.data.datasets[0].data = grossIncomeData;
-        incomeChart.data.datasets[0].aowData = aowData;
         incomeChart.data.datasets[1].data = netIncomeData;
+        incomeChart.data.datasets[2].data = aowData;
         incomeChart.options.scales.y.max = yAxisMax;
         incomeChart.update();
     } else {
@@ -119,11 +129,11 @@ function customGrossIncomeTooltip(context) {
         if (dataPoints[1]) {
             netIncome = dataPoints[1].raw;
         }
+        if (dataPoints[2]) {
+            aow = dataPoints[2].raw;
+        }
 
         const dataIndex = tooltip.dataPoints[0].dataIndex;
-        if (chart.data.datasets[0].aowData && Array.isArray(chart.data.datasets[0].aowData)) {
-            aow = chart.data.datasets[0].aowData[dataIndex] || 0;
-        }
 
         // Log the values to the console
         console.log('Tooltip Data:', {
@@ -140,18 +150,16 @@ function customGrossIncomeTooltip(context) {
             <div class="tooltip-header">Leeftijd: ${titleLines[0]}</div>
             <div class="tooltip-body">
                 <div class="tooltip-row">
-                    <span class="label">Bruto Inkomen:</span>
+                    <span class="label">Bruto Inkomen (Incl. AOW):</span>
                     <span class="value">${formatNumber(grossIncome)}</span>
                 </div>
-                ${aow > 0 ? `
-                <div class="tooltip-row">
-                    <span class="label">waarvan AOW:</span>
-                    <span class="value">${formatNumber(aow)}</span>
-                </div>
-                ` : ''}
                 <div class="tooltip-row">
                     <span class="label">Netto Inkomen:</span>
                     <span class="value">${formatNumber(netIncome)}</span>
+                </div>
+                <div class="tooltip-row">
+                    <span class="label">AOW:</span>
+                    <span class="value">${formatNumber(aow)}</span>
                 </div>
             </div>
         `;
