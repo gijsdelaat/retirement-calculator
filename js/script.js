@@ -37,7 +37,7 @@ function berekenBox3Sparen() {
     let contributionsData = [];
     let rendementData = [];
     const taxFreeAllowance = heeftFiscaalPartner ? 114000 : 57000;
-    const taxRate = 0.32;
+    const taxRate = 0.36;
 
     for (let i = 0; i < spaarduur; i++) {
         spaargeld += jaarlijkseBijdrage;
