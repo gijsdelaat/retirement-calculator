@@ -11,8 +11,8 @@ document.addEventListener('DOMContentLoaded', function() {
     <nav>
         <ul class="nav-list">
             <li><a href="box3sparen.html" class="${currentPage === 'box3sparen.html' ? 'active' : ''}">Box 3 Sparen</a></li>
-            <li><a href="pensioensparen.html" class="${currentPage === 'pensioensparen.html' ? 'active' : ''}">Pensioensparen</a></li>
-            <li><a href="bruto_netto.html" class="${currentPage === 'bruto_netto.html' ? 'active' : ''}">Netto/Bruto</a></li>
+            <li><a href="pensioensparen.html" class="${currentPage === 'pensioensparen.html' ? 'active' : ''}"> Pensioensparen</a></li>
+            <li><a href="bruto_netto.html" class="${currentPage === 'bruto_netto.html' ? 'active' : ''}"> Netto/Bruto</a></li>
         </ul>
     </nav>
     <div class="contact">

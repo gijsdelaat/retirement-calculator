@@ -92,6 +92,7 @@ header {
 }
 
 nav {
+    width: 100%;
     flex: 1;
     display: flex;
     justify-content: center;
@@ -150,7 +151,6 @@ nav {
     background-color: #fff;
     border-radius: 10px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-    display: flex;
     justify-content: space-between;
 }
 
@@ -161,7 +161,7 @@ nav {
 
 .chart-container {
     flex: 1;
-    min-width: 600px;
+    width: 100%;
 }
 
 .summary-container {
@@ -338,12 +338,11 @@ nav {
 
 .chart-container {
     flex: 2;
-    min-width: 900px;
+    width: 100%;
     padding: 20px;
     border: 2px solid #ddd;
     border-radius: 8px;
     background-color: #f9f9f9;
-    min-height: 600px; /* Flexible height starting from 600px */
 }
 
 .result {
@@ -618,9 +617,9 @@ button:hover {
 }
 
 .table-and-chart {
-    display: flex;
+    
     justify-content: space-between;
-    align-items: center;
+    
     width: 100%; /* Zorgt dat de container de volledige breedte van de sectie inneemt */
 }
 
@@ -953,7 +952,7 @@ footer {
 
 .contact-link {
     text-decoration: none;
-    color: #007bff;
+    color: #333;
     font-size: 14px;
     display: flex;
     align-items: center;
@@ -1108,6 +1107,9 @@ footer {
 @media (max-width: 768px) {
     .mobile-menu-toggle {
         display: block;
+    }
+    .contact {
+        display: none;
     }
 
     .nav-list {
