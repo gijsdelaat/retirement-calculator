@@ -304,31 +304,14 @@ function formatNumber(num) {
 chart.options.plugins.tooltip.enabled = false;
 chart.options.plugins.tooltip.external = customTooltip;
 
-// ... existing code ...
-
 document.addEventListener('DOMContentLoaded', function() {
     const calculatorOptions = document.querySelectorAll('.calculator-option');
     
     calculatorOptions.forEach(option => {
         const video = option.querySelector('video');
         
-        // Preload the video
-        video.preload = 'auto';
-        
-        // Remove poster if present
-        video.removeAttribute('poster');
-        
         option.addEventListener('mouseenter', () => {
-            // Reset the currentTime to ensure it starts from the beginning
-            video.currentTime = 0;
-            // Use play() as a promise
-            const playPromise = video.play();
-            
-            if (playPromise !== undefined) {
-                playPromise.catch(error => {
-                    console.error('Auto-play was prevented:', error);
-                });
-            }
+            video.play();
         });
         
         option.addEventListener('mouseleave', () => {

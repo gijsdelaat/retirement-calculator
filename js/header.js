@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const header = `
     <div class="logo" style="display: flex; align-items: center;">
     <a href="index.html" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
-        <img src="https://i.ibb.co/DR1gbRK/DALL-E-2024-05-27-14-37-17-A-clean-simple-and-serious-logo-for-a-financial-planning-business-featuri.png" alt="Logo" style="height: 50px; margin-right: 10px;">
+        <img src="src/mobile-logo.svg" alt="Logo" style="height: 80px; margin-right: 10px;margin: 15px; ">
         <h1>SpaarSlim</h1>
     </a>
 </div>

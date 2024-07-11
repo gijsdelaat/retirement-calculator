@@ -141,7 +141,7 @@ header nav ul li a i {
 .container {
     width: 100%; /* Ensure full width */
     max-width: 1400px;
-    margin: 100px auto 20px; /* Increased vertical margin */
+    margin: 120px auto 20px; /* Increased vertical margin */
     padding: 30px; /* Increased padding for better spacing inside */
     background-color: #fff;
     border-radius: 10px;
@@ -926,18 +926,6 @@ button:hover {
     margin-bottom: 15px;
 }
 
-@media (max-width: 768px) {
-    .calculator-options {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .calculator-option {
-        max-width: 100%;
-        width: 100%;
-        margin-bottom: 20px;
-    }
-}
 
 footer {
     background-color: #f8f9fa;
@@ -1002,21 +990,38 @@ footer {
     box-shadow: 0 6px 15px rgba(0,0,0,0.15);
 }
 
-.option-thumbnail {
-    position: relative;
-    width: 100%;
-    height: 0;
-    padding-bottom: 56.25%; /* 16:9 aspect ratio */
-    overflow: hidden;
-}
-
-.option-thumbnail video {
+.option-thumbnail img {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: opacity 0.3s ease;
+}
+
+.option-thumbnail {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    overflow: hidden;
+}
+
+.option-thumbnail img.static {
+    z-index: 2;
+}
+
+.option-thumbnail img.animated {
+    z-index: 1;
+    opacity: 0;
+}
+
+.calculator-option:hover .option-thumbnail img.static {
+    opacity: 0;
+}
+
+.calculator-option:hover .option-thumbnail img.animated {
+    opacity: 1;
 }
 
 .option-content {
