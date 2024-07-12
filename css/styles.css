@@ -144,7 +144,7 @@ nav {
 }
 
 .container {
-    width: 100%; /* Ensure full width */
+    width: 90%; /* Ensure full width */
     max-width: 1400px;
     margin: 20px auto 20px; /* Increased vertical margin */
     padding: 30px; /* Increased padding for better spacing inside */
