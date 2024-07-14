@@ -314,7 +314,7 @@ function calculateAndUpdateIncomeChart() {
             // Before retirement
             grossIncomeData.push(currentIncome);
             const annualPensionContribution = pensionFrequency === 'monthly' ? pensionContribution * 12 : pensionContribution;
-            const netSalary = calculateNetSalary(currentIncome, 'annual', true, currentAge, annualPensionContribution, 'annual').annualNetSalary;
+            const netSalary = calculateNetSalaryShared(currentIncome / 12, annualPensionContribution / 12, currentAge).annualNetSalary;
             netIncomeData.push(netSalary);
             aowData.push(0);
         } else {
@@ -322,7 +322,7 @@ function calculateAndUpdateIncomeChart() {
             const aowAmount = isAOWAge ? currentAOW : 0;
             const grossIncomeWithAOW = withdrawalEstimate * 12 + aowAmount;
             grossIncomeData.push(grossIncomeWithAOW);
-            const netSalary = calculateNetSalary(grossIncomeWithAOW, 'annual', true, currentAge, 0, 'annual').annualNetSalary;
+            const netSalary = calculateNetSalaryShared(grossIncomeWithAOW / 12, 0, currentAge).annualNetSalary;
             netIncomeData.push(netSalary);
             aowData.push(aowAmount);
         }
@@ -353,3 +353,4 @@ function calculate() {
     console.log('Calculating pension data');
     berekenPensioensparen();
 }
+

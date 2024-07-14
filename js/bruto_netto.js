@@ -1,22 +1,28 @@
 document.addEventListener('DOMContentLoaded', (event) => {
     console.log('DOM fully loaded and parsed');
-    initializeChart(); // Move this line here
-    updateSalaryInputLabel();
-    calculate();
-    attachEventListeners(); // Ensure this runs after the DOM is fully loaded
+    if (document.getElementById('salary')) {
+        // We're on the bruto_netto page
+        initializeChart();
+        updateSalaryInputLabel();
+        calculate();
+        attachEventListeners();
+    }
 });
-
-
 
 let salaryFrequency = 'monthly';
 let calculationType = 'brutoToNetto';
 
 function attachEventListeners() {
     console.log('Attaching event listeners');
-    document.getElementById('salary').addEventListener('input', calculate);
-    document.getElementById('vacationMoney').addEventListener('change', calculate);
-    document.getElementById('thirteenthMonth').addEventListener('change', calculate);
-    document.getElementById('age').addEventListener('input', calculate);
+    const salaryInput = document.getElementById('salary');
+    const vacationMoneyInput = document.getElementById('vacationMoney');
+    const thirteenthMonthInput = document.getElementById('thirteenthMonth');
+    const ageInput = document.getElementById('age');
+
+    if (salaryInput) salaryInput.addEventListener('input', calculate);
+    if (vacationMoneyInput) vacationMoneyInput.addEventListener('change', calculate);
+    if (thirteenthMonthInput) thirteenthMonthInput.addEventListener('change', calculate);
+    if (ageInput) ageInput.addEventListener('input', calculate);
 }
 
 function toggleFrequency(button, type) {
@@ -92,14 +98,10 @@ function swapCalculation() {
     }, 500); // Match the duration of the CSS transition
 }
 
-
-
-function calculateNetSalary(salary, frequency = 'monthly', applyTaxCredit = true, age = 30, pensionContribution = 0, pensionFrequency = 'monthly') {
-    // Convert salary to annual if it's monthly
-    const grossAnnualSalary = frequency === 'monthly' ? salary * 12 : salary;
-
-    // Convert pension contribution to annual if it's monthly
-    const annualPensionContribution = pensionFrequency === 'monthly' ? pensionContribution * 12 : pensionContribution;
+function calculateNetSalary(monthlySalary, monthlyPensionContribution, age) {
+    // Adjust this function to work with monthly values
+    const annualSalary = monthlySalary * 12;
+    const annualPensionContribution = monthlyPensionContribution * 12;
 
     const vacationMoneyCheckbox = document.getElementById('vacationMoney');
     const thirteenthMonthCheckbox = document.getElementById('thirteenthMonth');
@@ -107,10 +109,10 @@ function calculateNetSalary(salary, frequency = 'monthly', applyTaxCredit = true
     const vacationMoneyEnabled = vacationMoneyCheckbox ? vacationMoneyCheckbox.checked : false;
     const thirteenthMonthEnabled = thirteenthMonthCheckbox ? thirteenthMonthCheckbox.checked : false;
 
-    const vacationMoney = vacationMoneyEnabled ? grossAnnualSalary * 0.08 : 0;
-    const thirteenthMonth = thirteenthMonthEnabled ? grossAnnualSalary / 12 : 0;
+    const vacationMoney = vacationMoneyEnabled ? annualSalary * 0.08 : 0;
+    const thirteenthMonth = thirteenthMonthEnabled ? annualSalary / 12 : 0;
 
-    const totalGrossAnnualIncome = grossAnnualSalary + vacationMoney + thirteenthMonth;
+    const totalGrossAnnualIncome = annualSalary + vacationMoney + thirteenthMonth;
     const taxableIncome = totalGrossAnnualIncome - annualPensionContribution;
 
     const taxAmount = calculateTax(taxableIncome, age);
@@ -118,7 +120,7 @@ function calculateNetSalary(salary, frequency = 'monthly', applyTaxCredit = true
     const algemeneHeffingskorting = calculateAlgemeneHeffingskorting(taxableIncome, age);
     const arbeidskorting = calculateArbeidskorting(taxableIncome, age);
     const ouderenkorting = age >= 67 ? calculateOuderenkorting(taxableIncome) : 0;
-    const heffingskortingen = applyTaxCredit ? (algemeneHeffingskorting + arbeidskorting + ouderenkorting) : 0;
+    const heffingskortingen = (algemeneHeffingskorting + arbeidskorting + ouderenkorting);
 
     const effectiveTaxAmount = Math.max(0, taxAmount - heffingskortingen);
 
@@ -128,7 +130,7 @@ function calculateNetSalary(salary, frequency = 'monthly', applyTaxCredit = true
     return {
         monthlyNetSalary: netMonthlySalary,
         annualNetSalary: netAnnualSalary,
-        grossMonthlySalary: grossAnnualSalary / 12,
+        grossMonthlySalary: monthlySalary,
         grossAnnualSalary: totalGrossAnnualIncome,
         taxableIncome: taxableIncome,
         taxAmount: taxAmount,
@@ -234,34 +236,33 @@ function calculateOuderenkorting(totalGrossAnnualIncome) {
     }
 }
 
-function displayResults(salaries, salaryFrequency, pensionContribution, pensionFrequency) {
+function displayResults(salaries, displayFrequency) {
     const table = document.getElementById('resultsTable');
     table.innerHTML = ''; // Clear existing content
 
     const isAOWAge = parseInt(document.getElementById('age').value) >= 67;
 
-    const factor = salaryFrequency === 'monthly' ? 12 : 1;
-    const pensionFactor = pensionFrequency === 'monthly' ? 12 : 1;
+    const factor = displayFrequency === 'monthly' ? 1 : 12;
 
     const rows = [
-        { label: 'Bruto salaris', value: salaries.grossAnnualSalary / factor },
-        { label: 'Pensioenbijdrage', value: -salaries.annualPensionContribution / pensionFactor, isNegative: true },
-        { label: 'Belastbaar inkomen', value: salaries.taxableIncome / factor },
-        { label: 'Loonheffing', value: -salaries.taxAmount / factor, isNegative: true },
+        { label: 'Bruto salaris', value: salaries.grossAnnualSalary / 12 * factor },
+        { label: 'Pensioenbijdrage', value: -salaries.annualPensionContribution / 12 * factor, isNegative: true },
+        { label: 'Belastbaar inkomen', value: salaries.taxableIncome / 12 * factor },
+        { label: 'Loonheffing', value: -salaries.taxAmount / 12 * factor, isNegative: true },
         { label: 'Totaal heffingskortingen:', value: 0, isSubheader: true },
-        { label: '- Algemene heffingskorting', value: salaries.algemeneHeffingskorting / factor, indent: true },
-        { label: '- Arbeidskorting', value: salaries.arbeidskorting / factor, indent: true }
+        { label: '- Algemene heffingskorting', value: salaries.algemeneHeffingskorting / 12 * factor, indent: true },
+        { label: '- Arbeidskorting', value: salaries.arbeidskorting / 12 * factor, indent: true }
     ];
 
     if (isAOWAge) {
-        rows.push({ label: '- Ouderenkorting', value: salaries.ouderenkorting / factor, indent: true });
+        rows.push({ label: '- Ouderenkorting', value: salaries.ouderenkorting / 12 * factor, indent: true });
     }
 
-    const totalHeffingskortingen = (salaries.algemeneHeffingskorting + salaries.arbeidskorting + salaries.ouderenkorting) / factor;
+    const totalHeffingskortingen = (salaries.algemeneHeffingskorting + salaries.arbeidskorting + salaries.ouderenkorting) / 12 * factor;
     rows.push({ label: 'Totaal heffingskortingen', value: totalHeffingskortingen, isSubtotal: true });
 
-    rows.push({ label: 'Effectieve loonheffing', value: -salaries.effectiveTaxAmount / factor, isNegative: true });
-    rows.push({ label: 'Netto besteedbaar inkomen', value: salaries.annualNetSalary / factor, isTotal: true });
+    rows.push({ label: 'Effectieve loonheffing', value: -salaries.effectiveTaxAmount / 12 * factor, isNegative: true });
+    rows.push({ label: 'Netto besteedbaar inkomen', value: salaries.annualNetSalary / 12 * factor, isTotal: true });
 
     rows.forEach(row => {
         const tr = document.createElement('tr');
@@ -285,7 +286,7 @@ function displayResults(salaries, salaryFrequency, pensionContribution, pensionF
         table.appendChild(tr);
     });
 
-    updateChart(salaries, salaryFrequency);
+    updateChart(salaries, displayFrequency);
     updateSummary(); // Call this after updating the chart
 }
 
@@ -293,54 +294,18 @@ function formatCurrency(value) {
     return '€' + value.toFixed(2);
 }
 
-function updateChart(salaries, frequency) {
-    const factor = frequency === 'monthly' ? 12 : 1;
-    const grossIncome = salaries.grossAnnualSalary / factor;
-    const effectiveTaxAmount = salaries.effectiveTaxAmount / factor;
-    const netIncome = salaries.annualNetSalary / factor;
+function updateChart(salaries, displayFrequency) {
+    const factor = displayFrequency === 'monthly' ? 1 : 12;
+    const netIncome = salaries.annualNetSalary / 12 * factor;
+    const effectiveTaxAmount = salaries.effectiveTaxAmount / 12 * factor;
 
     if (!taxPieChartInstance) {
-        const ctx = document.getElementById('taxPieChart').getContext('2d');
-        taxPieChartInstance = new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: ['Netto besteedbaar inkomen', 'Effectieve loonheffing'],
-                datasets: [{
-                    data: [netIncome, effectiveTaxAmount],
-                    backgroundColor: ['#36a2eb', '#ff6384']
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed !== null) {
-                                    label += formatCurrency(context.parsed);
-                                }
-                                return label;
-                            }
-                        }
-                    }
-                },
-                animation: {
-                    duration: 500 // Adjust animation duration as needed
-                }
-            }
-        });
-    } else {
-        // Update existing chart data
-        taxPieChartInstance.data.datasets[0].data = [netIncome, effectiveTaxAmount];
-        taxPieChartInstance.update();
+        initializeChart();
     }
+
+    // Update existing chart data
+    taxPieChartInstance.data.datasets[0].data = [netIncome, effectiveTaxAmount];
+    taxPieChartInstance.update();
 }
 
 let grossIncome, netIncome, inkomstenbelasting, arbeidskorting, algemeneHeffingskorting, isMonthly;
@@ -362,21 +327,20 @@ function updateResultsSummary() {
 }
 
 function calculate() {
-    const salary = parseFloat(document.getElementById('salary').value);
-    const salaryFrequency = document.querySelector('.toggle-buttons .active').id === 'monthlyToggle' ? 'monthly' : 'annual';
+    const monthlySalary = parseFloat(document.getElementById('salary').value);
+    const displayFrequency = document.querySelector('.toggle-buttons .active').id === 'monthlyToggle' ? 'monthly' : 'annual';
     const age = parseInt(document.getElementById('age').value);
-    const pensionContribution = parseFloat(document.getElementById('pensionContribution').value) || 0;
-    const pensionFrequency = document.getElementById('monthlyContributionToggle').classList.contains('active') ? 'monthly' : 'annual';
+    const monthlyPensionContribution = parseFloat(document.getElementById('pensionContribution').value) || 0;
 
     let salaries;
     if (calculationType === 'brutoToNetto') {
-        salaries = calculateNetSalary(salary, salaryFrequency, true, age, pensionContribution, pensionFrequency);
+        salaries = calculateNetSalary(monthlySalary, monthlyPensionContribution, age);
     } else {
-        const brutoSalary = calculateBrutoFromNetto(salary, salaryFrequency);
-        salaries = calculateNetSalary(brutoSalary, salaryFrequency, true, age, pensionContribution, pensionFrequency);
+        const bruttoMonthlySalary = calculateBrutoFromNetto(monthlySalary);
+        salaries = calculateNetSalary(bruttoMonthlySalary, monthlyPensionContribution, age);
     }
 
-    displayResults(salaries, salaryFrequency, pensionContribution, pensionFrequency);
+    displayResults(salaries, displayFrequency);
     updateSummary();
 }
 
@@ -420,11 +384,11 @@ function initializeChart() {
     taxPieChartInstance = new Chart(ctx, {
         type: 'pie',
         data: {
-            labels: ['Belasting', 'Netto Inkomen'],
+            labels: ['Netto Inkomen', 'Belasting'],
             datasets: [{
                 data: [], // Initialize with empty data
-                backgroundColor: ['#FF6384', '#36A2EB'],
-                hoverBackgroundColor: ['#FF6384', '#36A2EB']
+                backgroundColor: ['#36A2EB', '#FF6384'],
+                hoverBackgroundColor: ['#36A2EB', '#FF6384']
             }]
         },
         options: {
@@ -437,8 +401,9 @@ function initializeChart() {
                     callbacks: {
                         label: function(tooltipItem) {
                             let label = tooltipItem.label;
-                            let value = tooltipItem.raw;
-                            let percentage = (value / grossIncome * 100).toFixed(2);
+                            let value = tooltipItem.parsed;
+                            let total = tooltipItem.dataset.data.reduce((a, b) => a + b, 0);
+                            let percentage = ((value / total) * 100).toFixed(2);
                             return `${label}: €${value.toFixed(2)} (${percentage}%)`;
                         }
                     }
@@ -448,26 +413,25 @@ function initializeChart() {
     });
 }
 
-function calculateBrutoFromNetto(netMonthlySalary, frequency = 'monthly') {
+function calculateBrutoFromNetto(netSalary) {
+    // Convert annual salary to monthly if necessary
+    const netMonthlySalary = netSalary;
+
     // Begin met een schatting van het bruto salaris
     let estimatedGrossMonthly = netMonthlySalary * 1.3; // Verhoog met 30% als startpunt
 
     let calculatedNetSalary = 0;
     let iterationCount = 0;
-    const maxIterations = 10; // Voorkom oneindige loops
-    const tolerance = 1; // Acceptabele foutmarge in euro's
+    const maxIterations = 20; // Verhoog het aantal iteraties voor meer nauwkeurigheid
+    const tolerance = 0.1; // Verlaag de tolerantie voor meer nauwkeurigheid
 
     // Gebruik een iteratieve benadering om het bruto salaris te vinden
     while (Math.abs(calculatedNetSalary - netMonthlySalary) > tolerance && iterationCount < maxIterations) {
-        const salaries = calculateNetSalary(estimatedGrossMonthly, frequency);
+        const salaries = calculateNetSalary(estimatedGrossMonthly, 0, parseInt(document.getElementById('age').value));
         calculatedNetSalary = salaries.monthlyNetSalary;
 
         // Pas de schatting aan op basis van het verschil
-        if (calculatedNetSalary < netMonthlySalary) {
-            estimatedGrossMonthly += (netMonthlySalary - calculatedNetSalary) * 1.1; // Verhoog bruto als netto te laag is
-        } else {
-            estimatedGrossMonthly -= (calculatedNetSalary - netMonthlySalary) * 1.1; // Verlaag bruto als netto te hoog is
-        }
+        estimatedGrossMonthly += (netMonthlySalary - calculatedNetSalary) * 1.1;
 
         iterationCount++;
     }
