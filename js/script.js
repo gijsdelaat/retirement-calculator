@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', (event) => {
-    berekenBox3Sparen();
+    berekenBox3Beleggen();
     updateSliders();
     setupEventListeners();
     initializeCollapsibles();
@@ -11,7 +11,7 @@ let chart;
 function setupEventListeners() {
     document.querySelectorAll('input').forEach(input => {
         input.addEventListener('input', () => {
-            berekenBox3Sparen();
+            berekenBox3Beleggen();
             updateSliders();
         });
     });
@@ -23,17 +23,17 @@ function setupEventListeners() {
     });
 }
 
-function berekenBox3Sparen() {
+function berekenBox3Beleggen() {
     const initieleInleg = parseFloat(document.getElementById('startAmount').value) || 0;
     const bijdrage = parseFloat(document.getElementById('annualContribution').value) || 0;
     const jaarlijksRendement = parseFloat(document.getElementById('annualReturn').value) / 100 || 0.07;
-    const spaarduur = parseFloat(document.getElementById('savingsDuration').value) || 0;
+    const beleggingsduur = parseFloat(document.getElementById('investmentDuration').value) || 0;
     const heeftFiscaalPartner = document.getElementById('fiscalPartner').checked;
 
     const jaarlijkseBijdrage = document.getElementById('monthlyToggle').classList.contains('active') ? bijdrage * 12 : bijdrage;
 
-    let spaargeld = initieleInleg;
-    let spaargeldData = [];
+    let beleggingswaarde = initieleInleg;
+    let beleggingswaardeData = [];
     let belastingData = [];
     let cumulativeContributions = initieleInleg;
     let contributionsData = [];
@@ -41,34 +41,34 @@ function berekenBox3Sparen() {
     const taxFreeAllowance = heeftFiscaalPartner ? 114000 : 57000;
     const taxRate = 0.36;
 
-    for (let i = 0; i < spaarduur; i++) {
-        spaargeld += jaarlijkseBijdrage;
+    for (let i = 0; i < beleggingsduur; i++) {
+        beleggingswaarde += jaarlijkseBijdrage;
         cumulativeContributions += jaarlijkseBijdrage;
         
         // Calculate Box 3 Belasting
-        const taxableAmount = Math.max(spaargeld - taxFreeAllowance, 0);
+        const taxableAmount = Math.max(beleggingswaarde - taxFreeAllowance, 0);
         const savingsReturn = taxableAmount * 0.005;
         const investmentsReturn = taxableAmount * 0.0533;
         const netReturn = savingsReturn + investmentsReturn;
         const belasting = netReturn * taxRate;
         
         // Apply the tax before calculating the return
-        spaargeld -= belasting;
+        beleggingswaarde -= belasting;
         
         // Calculate return after tax
-        spaargeld *= (1 + jaarlijksRendement);
+        beleggingswaarde *= (1 + jaarlijksRendement);
         
-        spaargeldData.push(spaargeld.toFixed(0));
+        beleggingswaardeData.push(beleggingswaarde.toFixed(0));
         contributionsData.push(cumulativeContributions.toFixed(0));
-        rendementData.push((spaargeld - cumulativeContributions).toFixed(0));
+        rendementData.push((beleggingswaarde - cumulativeContributions).toFixed(0));
         belastingData.push(belasting.toFixed(0));
     }
 
     // Update the estimated total display
-    const estimatedTotal = spaargeld;
-    document.getElementById('estimatedTotalDisplay').textContent = `€${estimatedTotal.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".")} spaargeld`;
+    const estimatedTotal = beleggingswaarde;
+    document.getElementById('estimatedTotalDisplay').textContent = `€${estimatedTotal.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".")} beleggingswaarde`;
 
-    const labels = Array.from({ length: spaarduur }, (_, i) => i + 1);
+    const labels = Array.from({ length: beleggingsduur }, (_, i) => i + 1);
 
     const ctx = document.getElementById('savingsChart');
     if (!ctx) {
@@ -79,7 +79,7 @@ function berekenBox3Sparen() {
     if (chart) {
         // Update existing chart
         chart.data.labels = labels;
-        chart.data.datasets[0].data = spaargeldData;
+        chart.data.datasets[0].data = beleggingswaardeData;
         chart.data.datasets[1].data = contributionsData;
         chart.update();
     } else {
@@ -101,8 +101,8 @@ function berekenBox3Sparen() {
                 labels: labels,
                 datasets: [
                     {
-                        label: 'Spaargeld',
-                        data: spaargeldData,
+                        label: 'Beleggingswaarde',
+                        data: beleggingswaardeData,
                         borderColor: 'rgba(75, 192, 192, 1)',
                         backgroundColor: gradient,
                         fill: true,
@@ -163,9 +163,9 @@ function berekenBox3Sparen() {
                                 return '';  // We'll use afterBody for all labels
                             },
                             afterBody: function(tooltipItems) {
-                                const spaargeld = tooltipItems[0].parsed.y;
+                                const beleggingswaarde = tooltipItems[0].parsed.y;
                                 const eigenInleg = tooltipItems[1].parsed.y;
-                                const rendement = spaargeld - eigenInleg;
+                                const rendement = beleggingswaarde - eigenInleg;
                                 
                                 const formatNumber = (num) => '€' + num.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
                                 const padRight = (str, length) => str.padStart(length, ' ');
@@ -175,7 +175,7 @@ function berekenBox3Sparen() {
                                 const formatLabel = (label) => label.padEnd(labelWidth);
                                 const formatValue = (value) => formatNumber(value).padStart(valueWidth);
                                 return [
-                                    `${formatLabel('Spaargeld:')}${formatValue(spaargeld)}`,
+                                    `${formatLabel('Beleggingswaarde:')}${formatValue(beleggingswaarde)}`,
                                     `${formatLabel('Eigen inleg:')}${formatValue(eigenInleg)}`,
                                     `${formatLabel('Rendement:')}${formatValue(rendement)}`
                                 ];
@@ -233,7 +233,7 @@ function berekenBox3Sparen() {
         const dataTableBody = dataTable.querySelector('tbody');
         if (dataTableBody) {
             dataTableBody.innerHTML = '';
-            spaargeldData.forEach((data, index) => {
+            beleggingswaardeData.forEach((data, index) => {
                 const belasting = belastingData[index];
                 const row = document.createElement('tr');
                 row.innerHTML = `<td>${index + 1}</td><td>€${data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}</td><td>€${(data * jaarlijksRendement).toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}</td><td>€${belasting.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}</td>`;
@@ -244,22 +244,33 @@ function berekenBox3Sparen() {
 
     // Add explanation
     const explanation = `
-        <p><strong>Hoe we je Box 3 spaargeld berekenen:</strong></p>
-        <p>We kijken naar je spaargeld en belasting voor ${spaarduur} jaar.</p>
+        
+        <p>Deze berekening is gebaseerd op de box 3 belastingregels van 2024. Houd er rekening mee dat dit een inschatting is en dat belastingregels jaarlijks kunnen veranderen.</p>
+        <p>Voor de meest actuele informatie, raadpleeg de <a href="https://www.belastingdienst.nl/wps/wcm/connect/nl/box-3/content/box-3-inkomen-op-voorlopige-aanslag-2024" target="_blank" rel="noopener">officiële Belastingdienst website</a>.</p>
+        <p>We berekenen de waarde van de beleggingen en de Box 3 belasting voor elk jaar gedurende de beleggingsduur van ${beleggingsduur} jaar.</p>
         <ul>
-            <li>Je begint met €${initieleInleg.toFixed(2)}</li>
-            <li>Je voegt elk jaar €${jaarlijkseBijdrage.toFixed(2)} toe</li>
-            <li>Je geld groeit met ${(jaarlijksRendement * 100).toFixed(2)}% per jaar</li>
-            <li>Fiscaal partner: ${heeftFiscaalPartner ? 'Ja' : 'Nee'}</li>
+            <li><strong>Startbedrag:</strong> €${initieleInleg.toFixed(2)}</li>
+            <li><strong>Jaarlijkse inleg:</strong> €${jaarlijkseBijdrage.toFixed(2)}</li>
+            <li><strong>Verwacht jaarlijks rendement:</strong> ${(jaarlijksRendement * 100).toFixed(2)}%</li>
+            <li><strong>Fiscaal partner:</strong> ${heeftFiscaalPartner ? 'Ja' : 'Nee'}</li>
         </ul>
-        <p><strong>Elk jaar doen we dit:</strong></p>
+        <p><strong>Jaarlijkse Berekening:</strong></p>
         <ol>
-            <li>We tellen je nieuwe inleg erbij op</li>
-            <li>We berekenen hoeveel belasting je moet betalen</li>
-            <li>We halen de belasting van je spaargeld af</li>
-            <li>We laten je geld groeien met het jaarlijks rendement</li>
+            <li>Voeg de jaarlijkse inleg toe aan de beleggingen</li>
+            <li>Bereken de Box 3 belasting:
+                <ul>
+                    <li>Heffingsvrij vermogen: €${taxFreeAllowance.toFixed(2)}</li>
+                    <li>Belastbaar bedrag = Max(Beleggingswaarde - Heffingsvrij vermogen, 0)</li>
+                    <li>Rendement op spaargeld: 0.5% van belastbaar bedrag</li>
+                    <li>Rendement op beleggingen: 5.33% van belastbaar bedrag</li>
+                    <li>Totaal fictief rendement = Rendement spaargeld + Rendement beleggingen</li>
+                    <li>Box 3 belasting = 36% van totaal fictief rendement</li>
+                </ul>
+            </li>
+            <li>Trek de Box 3 belasting af van de beleggingswaarde</li>
+            <li>Pas het verwachte jaarlijks rendement toe op de resterende beleggingswaarde</li>
         </ol>
-        <p><strong>Let op:</strong> We gebruiken de belastingregels van 2024. Deze kunnen in de toekomst veranderen.</p>
+        <p><strong>Opmerking:</strong> Deze berekeningen zijn gebaseerd op de huidige Box 3 belastingregels (2024) en kunnen in de toekomst veranderen. Het werkelijke rendement kan afwijken van het verwachte rendement.</p>
     `;
 
     document.getElementById('box3-calculation-details').innerHTML = explanation;
@@ -267,7 +278,7 @@ function berekenBox3Sparen() {
 
 function updateSliders() {
     document.getElementById('annualReturnDisplay').textContent = `${parseFloat(document.getElementById('annualReturn').value).toFixed(0)}%`;
-    document.getElementById('savingsDurationDisplay').textContent = parseFloat(document.getElementById('savingsDuration').value).toFixed(0);
+    document.getElementById('investmentDurationDisplay').textContent = parseFloat(document.getElementById('investmentDuration').value).toFixed(0);
 }
 
 function toggleFrequency(button, type) {
@@ -276,7 +287,7 @@ function toggleFrequency(button, type) {
         document.getElementById('monthlyToggle').classList.remove('active');
         button.classList.add('active');
     }
-    berekenBox3Sparen();
+    berekenBox3Beleggen();
 }
 
 function customTooltip(chart) {
@@ -296,17 +307,17 @@ function customTooltip(chart) {
 
     // Get the data for the tooltip
     const dataPoint = tooltipModel.dataPoints[0];
-    const spaargeld = parseFloat(dataPoint.raw);
+    const beleggingswaarde = parseFloat(dataPoint.raw);
     const eigenInleg = parseFloat(chart.data.datasets[1].data[dataPoint.dataIndex]);
-    const rendement = spaargeld - eigenInleg;
+    const rendement = beleggingswaarde - eigenInleg;
 
     // Create the tooltip content
     let tooltipContent = `
         <div class="tooltip-header">Jaar: ${dataPoint.label}</div>
         <div class="tooltip-body">
             <div class="tooltip-row">
-                <span class="label">Spaargeld:</span>
-                <span class="value">${formatNumber(spaargeld)}</span>
+                <span class="label">Beleggingswaarde:</span>
+                <span class="value">${formatNumber(beleggingswaarde)}</span>
             </div>
             <div class="tooltip-row">
                 <span class="label">Eigen inleg:</span>
