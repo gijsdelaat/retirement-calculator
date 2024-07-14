@@ -241,6 +241,28 @@ function berekenBox3Sparen() {
             });
         }
     }
+
+    // Add explanation
+    const explanation = `
+        <p><strong>Hoe we je Box 3 spaargeld berekenen:</strong></p>
+        <p>We kijken naar je spaargeld en belasting voor ${spaarduur} jaar.</p>
+        <ul>
+            <li>Je begint met €${initieleInleg.toFixed(2)}</li>
+            <li>Je voegt elk jaar €${jaarlijkseBijdrage.toFixed(2)} toe</li>
+            <li>Je geld groeit met ${(jaarlijksRendement * 100).toFixed(2)}% per jaar</li>
+            <li>Fiscaal partner: ${heeftFiscaalPartner ? 'Ja' : 'Nee'}</li>
+        </ul>
+        <p><strong>Elk jaar doen we dit:</strong></p>
+        <ol>
+            <li>We tellen je nieuwe inleg erbij op</li>
+            <li>We berekenen hoeveel belasting je moet betalen</li>
+            <li>We halen de belasting van je spaargeld af</li>
+            <li>We laten je geld groeien met het jaarlijks rendement</li>
+        </ol>
+        <p><strong>Let op:</strong> We gebruiken de belastingregels van 2024. Deze kunnen in de toekomst veranderen.</p>
+    `;
+
+    document.getElementById('box3-calculation-details').innerHTML = explanation;
 }
 
 function updateSliders() {
