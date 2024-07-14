@@ -239,10 +239,7 @@ function berekenPensioensparen() {
             <li>PMT = Jaarlijkse bijdrage (€${bijdrage.toFixed(2)})</li>
         </ul>
         <p>Met deze gegevens komt het geschatte pensioenkapitaal op €${FV1.toFixed(2)}.</p>
-        <p><strong>Berekening van de Maandelijkse Uitkering:</strong></p>
-        <p>We gebruiken een iteratieve methode om de maandelijkse uitkering te berekenen, zodat het pensioenkapitaal ongeveer op is aan het einde van de verwachte levensduur. Hierbij houden we rekening met een rendement na pensioen van ${(rendementNaPensioen * 100).toFixed(2)}%.</p>
-        <p><strong>AOW Berekening:</strong></p>
-        <p>We starten met een basis AOW-bedrag van €13.200 per jaar. Dit bedrag groeit jaarlijks met ${(AOWGrowthRate * 100).toFixed(1)}% vanaf het huidige jaar tot aan en tijdens de pensioenperiode.</p>
+        
     `;
 
     document.getElementById('calculation-details').innerHTML = explanation;
