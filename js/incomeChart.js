@@ -6,14 +6,18 @@ function updateIncomeChart(labels, grossIncomeData, netIncomeData, aowData) {
     const maxIncome = Math.max(...grossIncomeData, ...netIncomeData);
     const yAxisMax = Math.ceil(maxIncome * 1.2 / 10000) * 10000;
 
-    // Log the data being passed to the chart
-    console.log('Updating Income Chart with data:', {
-        labels,
-        grossIncomeData,
-        netIncomeData,
-        aowData,
-        yAxisMax
-    });
+    // Create gradients
+    const gradientGross = ctxIncome.createLinearGradient(0, 0, 0, ctxIncome.canvas.height);
+    gradientGross.addColorStop(0, 'rgba(255, 99, 132, 0.6)');
+    gradientGross.addColorStop(1, 'rgba(255, 99, 132, 0.1)');
+
+    const gradientNet = ctxIncome.createLinearGradient(0, 0, 0, ctxIncome.canvas.height);
+    gradientNet.addColorStop(0, 'rgba(54, 162, 235, 0.6)');
+    gradientNet.addColorStop(1, 'rgba(54, 162, 235, 0.1)');
+
+    const gradientAOW = ctxIncome.createLinearGradient(0, 0, 0, ctxIncome.canvas.height);
+    gradientAOW.addColorStop(0, 'rgba(75, 192, 192, 0.6)');
+    gradientAOW.addColorStop(1, 'rgba(75, 192, 192, 0.1)');
 
     const chartConfig = {
         type: 'line',
@@ -23,7 +27,7 @@ function updateIncomeChart(labels, grossIncomeData, netIncomeData, aowData) {
                 label: 'Bruto Inkomen',
                 data: grossIncomeData,
                 borderColor: 'rgba(255, 99, 132, 1)',
-                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                backgroundColor: gradientGross,
                 borderWidth: 3,
                 pointRadius: 0,
                 pointHoverRadius: 5,
@@ -34,7 +38,7 @@ function updateIncomeChart(labels, grossIncomeData, netIncomeData, aowData) {
                 label: 'Netto Inkomen',
                 data: netIncomeData,
                 borderColor: 'rgba(54, 162, 235, 1)',
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                backgroundColor: gradientNet,
                 borderWidth: 3,
                 pointRadius: 0,
                 pointHoverRadius: 5,
@@ -45,7 +49,7 @@ function updateIncomeChart(labels, grossIncomeData, netIncomeData, aowData) {
                 label: 'AOW',
                 data: aowData,
                 borderColor: 'rgba(75, 192, 192, 1)',
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                backgroundColor: gradientAOW,
                 borderWidth: 3,
                 pointRadius: 0,
                 pointHoverRadius: 5,
@@ -151,15 +155,15 @@ function customGrossIncomeTooltip(context) {
             <div class="tooltip-body">
                 <div class="tooltip-row">
                     <span class="label">Bruto Inkomen (Incl. AOW):</span>
-                    <span class="value">${formatNumber(grossIncome)}</span>
+                    <span class="value">€${formatNumber(grossIncome)}</span>
                 </div>
                 <div class="tooltip-row">
                     <span class="label">Netto Inkomen:</span>
-                    <span class="value">${formatNumber(netIncome)}</span>
+                    <span class="value">€${formatNumber(netIncome)}</span>
                 </div>
                 <div class="tooltip-row">
                     <span class="label">AOW:</span>
-                    <span class="value">${formatNumber(aow)}</span>
+                    <span class="value">€${formatNumber(aow)}</span>
                 </div>
             </div>
         `;
@@ -171,4 +175,11 @@ function customGrossIncomeTooltip(context) {
     tooltipEl.style.position = 'absolute';
     tooltipEl.style.left = position.left + window.pageXOffset + tooltip.caretX + 'px';
     tooltipEl.style.top = position.top + window.pageYOffset + tooltip.caretY + 'px';
+}
+
+function formatNumber(number) {
+    return new Intl.NumberFormat('nl-NL', { 
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(Math.round(number));
 }

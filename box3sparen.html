@@ -40,7 +40,7 @@
                     </div>
                 </div>
 
-                <label for="annualReturn">Jaarlijks rendement: <span class="tooltip" title="Het percentage rendement dat je jaarlijks verwacht te behalen op je spaargeld.">ℹ️</span></label>
+                <label for="annualReturn">Geschat Jaarlijks rendement: <span class="tooltip" title="Het percentage rendement dat je jaarlijks verwacht te behalen op je spaargeld.">ℹ️</span></label>
                 <div class="slider-container">
                     <input type="range" id="annualReturn" min="0" max="20" step="1" value="7" class="slider">
                     <span id="annualReturnDisplay">7%</span>
@@ -75,20 +75,22 @@
                     <canvas id="savingsChart"></canvas>
                 
         
-                <h2>Overzicht</h2>
-                <table id="dataTable">
-                    <thead>
-                        <tr>
-                            <th>Jaar</th>
-                            <th>Spaargeld (€)</th>
-                            <th>Jaarlijks Rendement (€) <span class="tooltip" title="Dit is het bedrag dat je dat jaar verdient aan rendement op je spaargeld en beleggingen.">ℹ️</span></th>
-                            <th>Box 3 Belasting (€)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Dynamische data komt hier -->
-                    </tbody>
-                </table>
+                <button class="table-collapsible">Overzicht</button>
+                <div class="table-collapsible-content">
+                    <table id="dataTable">
+                        <thead>
+                            <tr>
+                                <th>Jaar</th>
+                                <th>Spaargeld (€)</th>
+                                <th>Jaarlijks Rendement (€) <span class="tooltip" title="Dit is het bedrag dat je dat jaar verdient aan rendement op je spaargeld en beleggingen.">ℹ️</span></th>
+                                <th>Box 3 Belasting (€)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dynamische data komt hier -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

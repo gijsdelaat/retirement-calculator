@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         updateSliders();
         setupEventListeners();
         initializeCollapsibles();
+        initializeTableCollapsibles();
     } else {
         console.log('Not on pension calculator page, skipping initialization');
     }
@@ -21,12 +22,14 @@ function setupEventListeners() {
         input.addEventListener('input', () => {
             berekenPensioensparen();
             updateSliders();
+            calculateAndUpdateIncomeChart();
         });
     });
 
     document.querySelectorAll('.toggle-buttons button').forEach(button => {
         button.addEventListener('click', (event) => {
             toggleFrequency(event.target, event.target.closest('.input-toggle-container').querySelector('input').id === 'annualContribution' ? 'contribution' : 'salary');
+            calculateAndUpdateIncomeChart();
         });
     });
 
@@ -124,6 +127,12 @@ function berekenPensioensparen() {
         chartInleg.update();
     } else {
         const ctxInleg = document.getElementById('pensionChartInleg').getContext('2d');
+        
+        // Create gradient
+        const gradientFill = ctxInleg.createLinearGradient(0, 0, 0, ctxInleg.canvas.height);
+        gradientFill.addColorStop(0, 'rgba(75, 192, 192, 0.6)');
+        gradientFill.addColorStop(1, 'rgba(75, 192, 192, 0.1)');
+
         chartInleg = new Chart(ctxInleg, {
             type: 'line',
             data: {
@@ -132,7 +141,7 @@ function berekenPensioensparen() {
                     label: 'Pensioen',
                     data: spaargeldData,
                     borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    backgroundColor: gradientFill,
                     borderWidth: 3,
                     pointBackgroundColor: '#fff',
                     pointBorderColor: 'rgba(75, 192, 192, 1)',
@@ -157,7 +166,7 @@ function berekenPensioensparen() {
                     y: {
                         ticks: {
                             callback: function(value) {
-                                return formatNumber(value);
+                                return '€' + formatNumber(value);
                             },
                             beginAtZero: true
                         }
@@ -194,7 +203,11 @@ function berekenPensioensparen() {
     dataTableBody.innerHTML = ''; // Clear existing rows
     spaargeldData.forEach((data, index) => {
         const row = document.createElement('tr');
-        row.innerHTML = `<td>${leeftijd + index}</td><td>€${data}</td><td>€${(data * jaarlijksRendement).toFixed(0)}</td>`;
+        row.innerHTML = `
+            <td>${leeftijd + index}</td>
+            <td>€${formatNumber(parseFloat(data))}</td>
+            <td>€${formatNumber((parseFloat(data) * jaarlijksRendement).toFixed(0))}</td>
+        `;
         dataTableBody.appendChild(row);
     });
 
@@ -248,7 +261,7 @@ function customPensioensparenTooltip(context) {
             <div class="tooltip-body">
                 <div class="tooltip-row">
                     <span class="label">Pensioen:</span>
-                    <span class="value">${formatNumber(pensionData)}</span>
+                    <span class="value">€${formatNumber(pensionData)}</span>
                 </div>
             </div>
         `;
@@ -276,8 +289,11 @@ function getOrCreateTooltip(chart) {
 }
 
 // Helper function to format numbers
-function formatNumber(num) {
-    return '€' + num.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+function formatNumber(number) {
+    return new Intl.NumberFormat('nl-NL', { 
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(Math.round(number));
 }
 
 function calculateAndUpdateIncomeChart() {
@@ -296,9 +312,7 @@ function calculateAndUpdateIncomeChart() {
     const AOWStartAmount = 13200; // Starting AOW amount
     const AOWGrowthRate = 0.02; // 2% annual growth for AOW
 
-    const jarenTotPensioen = pensioenLeeftijd - leeftijd;
-    const jarenNaPensioen = levensverwachting - pensioenLeeftijd;
-    const totalYears = jarenTotPensioen + jarenNaPensioen;
+    const totalYears = levensverwachting - leeftijd;
 
     let grossIncomeData = [];
     let netIncomeData = [];
@@ -306,17 +320,34 @@ function calculateAndUpdateIncomeChart() {
     let currentIncome = brutoInkomen;
     let currentAOW = AOWStartAmount;
 
+    const incomeDataTableBody = document.getElementById('incomeDataTable').querySelector('tbody');
+    incomeDataTableBody.innerHTML = ''; // Clear existing rows
+
     for (let i = 0; i < totalYears; i++) {
         const currentAge = leeftijd + i;
         const isAOWAge = currentAge >= AOWLeeftijd;
+        const isRetired = currentAge >= pensioenLeeftijd;
         
-        if (i < jarenTotPensioen) {
+        if (!isRetired) {
             // Before retirement
             grossIncomeData.push(currentIncome);
             const annualPensionContribution = pensionFrequency === 'monthly' ? pensionContribution * 12 : pensionContribution;
             const netSalary = calculateNetSalaryShared(currentIncome / 12, annualPensionContribution / 12, currentAge).annualNetSalary;
             netIncomeData.push(netSalary);
             aowData.push(0);
+
+            // Add row to the table
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${currentAge}</td>
+                <td>€${formatNumber(currentIncome)}</td>
+                <td>€${formatNumber(netSalary)}</td>
+                <td>€0</td>
+            `;
+            incomeDataTableBody.appendChild(row);
+
+            // Apply income growth
+            currentIncome *= (1 + incomeGrowth);
         } else {
             // After retirement
             const aowAmount = isAOWAge ? currentAOW : 0;
@@ -325,18 +356,30 @@ function calculateAndUpdateIncomeChart() {
             const netSalary = calculateNetSalaryShared(grossIncomeWithAOW / 12, 0, currentAge).annualNetSalary;
             netIncomeData.push(netSalary);
             aowData.push(aowAmount);
-        }
-        
-        // Apply income growth
-        currentIncome *= (1 + incomeGrowth);
-        
-        // Only start growing AOW from AOW age
-        if (isAOWAge) {
-            currentAOW *= (1 + AOWGrowthRate);
+
+            // Add row to the table
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${currentAge}</td>
+                <td>€${formatNumber(grossIncomeWithAOW)}</td>
+                <td>€${formatNumber(netSalary)}</td>
+                <td>€${formatNumber(aowAmount)}</td>
+            `;
+            incomeDataTableBody.appendChild(row);
+
+            // Apply AOW growth if applicable
+            if (isAOWAge) {
+                currentAOW *= (1 + AOWGrowthRate);
+            }
         }
     }
 
     const labels = Array.from({ length: totalYears }, (_, i) => leeftijd + i);
+
+    // Round the numbers before passing them to updateIncomeChart
+    grossIncomeData = grossIncomeData.map(value => Math.round(value));
+    netIncomeData = netIncomeData.map(value => Math.round(value));
+    aowData = aowData.map(value => Math.round(value));
 
     // Log the data before calling updateIncomeChart
     console.log('Calculated Data for Income Chart:', {
@@ -353,4 +396,17 @@ function calculate() {
     console.log('Calculating pension data');
     berekenPensioensparen();
 }
-
+function initializeTableCollapsibles() {
+    var coll = document.getElementsByClassName("table-collapsible");
+    for (var i = 0; i < coll.length; i++) {
+        coll[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var content = this.nextElementSibling;
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+            } else {
+                content.classList.add('show');
+            }
+        });
+    }
+}

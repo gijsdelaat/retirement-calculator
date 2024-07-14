@@ -2,6 +2,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
     berekenBox3Sparen();
     updateSliders();
     setupEventListeners();
+    initializeCollapsibles();
+    initializeTableCollapsibles();
 });
 
 let chart;
@@ -320,3 +322,34 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+function initializeCollapsibles() {
+    var coll = document.getElementsByClassName("collapsible");
+    for (var i = 0; i < coll.length; i++) {
+        coll[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var content = this.nextElementSibling;
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null;
+            } else {
+                content.style.maxHeight = content.scrollHeight + "px";
+            }
+        });
+    }
+}
+
+function initializeTableCollapsibles() {
+    var coll = document.getElementsByClassName("table-collapsible");
+    for (var i = 0; i < coll.length; i++) {
+        coll[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var content = this.nextElementSibling;
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+            } else {
+                content.classList.add('show');
+            }
+        });
+    }
+}
+

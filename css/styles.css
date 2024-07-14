@@ -691,13 +691,13 @@ button:hover {
 }
 
 .estimated-withdrawal-container {
-    margin: 20px auto;
-    padding: 15px;
+    margin: 1rem auto;
+    padding: 1rem;
     background-color: #f2f2f2;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     text-align: center;
-    width: 80%; /* Adjust width as necessary */
+    width: 60%; /* Adjust width as necessary */
 }
 
 .estimated-withdrawal-container h2 {
@@ -1161,7 +1161,59 @@ footer {
         display: flex;
     }
 }
+.table-collapsible {
+    background-color: #f9f9f9;
+    color: #333;
+    cursor: pointer;
+    padding: 15px 20px;
+    width: 100%;
+    border: 2px solid #ddd;
+    text-align: left;
+    outline: none;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.3s, border-color 0.3s;
+    font-family: 'Poppins', sans-serif;
+}
 
+.table-collapsible:hover {
+    background-color: #f1f1f1;
+    border-color: #ccc;
+}
+
+.table-collapsible::after {
+    content: '\25BC';
+    font-size: 14px;
+    color: #333;
+    transition: transform 0.3s;
+}
+
+.table-collapsible.active::after {
+    transform: rotate(-180deg);
+}
+
+.table-collapsible-content {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    background-color: #fff;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    margin-top: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+.table-collapsible-content.show {
+    max-height: 1000px; /* Adjust this value based on your content */
+    opacity: 1;
+    padding: 20px;
+}
 
 
 
