@@ -1,10 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
+:root {
+  font-size: 14px; /* Reduce the base font size */
+}
+
 body {
     font-family: 'Poppins', sans-serif;
     margin: 0;
     padding: 0;
     background-color: #f4f4f4;
+    font-size: 1rem; /* Use relative units */
 }
 
 .header-container {
@@ -145,23 +150,20 @@ nav {
 
 .container {
     width: 90%; /* Ensure full width */
-    max-width: 1400px;
-    margin: 20px auto 20px; /* Increased vertical margin */
-    padding: 30px; /* Increased padding for better spacing inside */
+    max-width: 1200px; /* Adjust the max-width if needed */
+    margin: 1rem auto 1rem; /* Increased vertical margin */
+    padding: 1rem; /* Use relative units */
     background-color: #fff;
     border-radius: 10px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     justify-content: space-between;
 }
 
-.calculator {
-    flex: 1;
-    margin-right: 20px;
-}
+
 
 .chart-container {
     flex: 1;
-    width: 100%;
+    width: 90%;
 }
 
 .summary-container {
@@ -196,13 +198,14 @@ nav {
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
+    flex-direction: row;
+    gap: 1rem;
 }
 
 
 .calculator {
     flex: 1;
     min-width: 300px;
-    margin-right: 20px;
     padding: 20px;
     border: 2px solid #ddd;
     border-radius: 8px;
@@ -254,7 +257,7 @@ nav {
 }
 
 .input-container {
-    margin-bottom: 20px;
+    margin-bottom: 0.8rem;
 }
 
 .input-container label {
@@ -339,7 +342,7 @@ nav {
 
 .chart-container {
     flex: 2;
-    width: 100%;
+    width: 90%;
     padding: 20px;
     border: 2px solid #ddd;
     border-radius: 8px;
@@ -366,7 +369,7 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
-    font-size: 14px;
+    font-size: 0.9rem;
 }
 
 table, th, td {
@@ -374,7 +377,7 @@ table, th, td {
 }
 
 th, td {
-    padding: 15px; /* Increased from 12px */
+    padding: 0.4rem 0.6rem;
     text-align: left;
 }
 
@@ -799,6 +802,43 @@ button:hover {
     text-align: center;
 }
 
+/* Adjust spacing for mobile */
+@media (max-width: 768px) {
+  .content {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  
+  .calculator, .chart-container {
+    width: 90%;
+  }
+}
+
+/* Reduce the size of charts */
+canvas {
+  max-height: 300px; /* Adjust as needed */
+}
+
+/* Make the table more compact */
+table {
+  font-size: 0.9rem;
+}
+
+th, td {
+  padding: 0.4rem 0.6rem;
+}
+
+/* Adjust spacing for mobile */
+@media (max-width: 768px) {
+  .content {
+    flex-direction: row ;
+  }
+  
+  .calculator, .chart-container {
+    width: 100%;
+  }
+}
+
 .calculator-button {
     display: inline-block;
     padding: 10px 15px;
@@ -1121,5 +1161,7 @@ footer {
         display: flex;
     }
 }
+
+
 
 
