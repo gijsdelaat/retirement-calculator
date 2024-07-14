@@ -84,7 +84,18 @@ function berekenBox3Sparen() {
         chart.update();
     } else {
         // Create new chart
-        chart = new Chart(ctx.getContext('2d'), {
+        const ctx = document.getElementById('savingsChart').getContext('2d');
+        
+        // Create gradient
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(75, 192, 192, 0.6)');
+        gradient.addColorStop(1, 'rgba(75, 192, 192, 0.1)');
+
+        const contributionsGradient = ctx.createLinearGradient(0, 0, 0, 400);
+        contributionsGradient.addColorStop(0, 'rgba(75, 192, 75, 0.6)');
+        contributionsGradient.addColorStop(1, 'rgba(75, 192, 75, 0.1)');
+
+        chart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: labels,
@@ -93,7 +104,7 @@ function berekenBox3Sparen() {
                         label: 'Spaargeld',
                         data: spaargeldData,
                         borderColor: 'rgba(75, 192, 192, 1)',
-                        backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                        backgroundColor: gradient,
                         fill: true,
                         tension: 0.4,
                         pointRadius: 0,
@@ -106,7 +117,7 @@ function berekenBox3Sparen() {
                         label: 'Eigen Inleg',
                         data: contributionsData,
                         borderColor: 'rgba(75, 192, 75, 1)',
-                        backgroundColor: 'rgba(75, 192, 75, 0.1)',
+                        backgroundColor: contributionsGradient,
                         fill: true,
                         tension: 0.4,
                         pointRadius: 0,
