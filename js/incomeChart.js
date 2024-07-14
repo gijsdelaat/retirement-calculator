@@ -183,3 +183,4 @@ function formatNumber(number) {
         maximumFractionDigits: 0
     }).format(Math.round(number));
 }
+

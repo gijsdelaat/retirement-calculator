@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 });
 
 let chartInleg;
+let spaargeldData = [];
 
 function setupEventListeners() {
     console.log('Setting up event listeners for pension calculator');
@@ -37,6 +38,10 @@ function setupEventListeners() {
     document.getElementById('monthlyToggle').addEventListener('click', calculateAndUpdateIncomeChart);
     document.getElementById('annualToggle').addEventListener('click', calculateAndUpdateIncomeChart);
     document.getElementById('incomeGrowth').addEventListener('input', updateSliders);
+    document.getElementById('aowGrowth').addEventListener('input', function() {
+        updateSliders();
+        calculate();
+    });
 }
 
 function initializeCollapsibles() {
@@ -63,6 +68,7 @@ function berekenPensioensparen() {
     const leeftijd = parseFloat(document.getElementById('age').value) || 0;
     const levensverwachting = parseFloat(document.getElementById('lifeExpectancy').value) || 90;
     const brutoInkomen = parseFloat(document.getElementById('grossIncome').value) || 0;
+    const AOWGrowthRate = parseFloat(document.getElementById('aowGrowth').value) / 100 || 0.01;
 
     const isMonthly = document.getElementById('monthlyToggle').classList.contains('active');
     if (isMonthly) {
@@ -103,7 +109,7 @@ function berekenPensioensparen() {
     document.getElementById('estimatedWithdrawalDisplay').textContent = `€${monthlyWithdrawal.toFixed(2)} bruto per maand`;
 
     let spaargeldTotPensioen = initieleInleg;
-    let spaargeldData = [];
+    spaargeldData = [];
     let totalYears = jarenTotPensioen + jarenNaPensioen + 5; // Extend 5 years beyond life expectancy
 
     for (let i = 0; i < totalYears; i++) {
@@ -111,8 +117,16 @@ function berekenPensioensparen() {
             spaargeldTotPensioen += bijdrage;
             spaargeldTotPensioen *= (1 + jaarlijksRendement);
         } else {
-            spaargeldTotPensioen -= withdrawalEstimate;
-            spaargeldTotPensioen *= (1 + rendementNaPensioen);
+            if (spaargeldTotPensioen > 0) {
+                spaargeldTotPensioen -= withdrawalEstimate;
+                if (spaargeldTotPensioen > 0) {
+                    spaargeldTotPensioen *= (1 + rendementNaPensioen);
+                } else {
+                    spaargeldTotPensioen = 0;
+                }
+            } else {
+                withdrawalEstimate = 0; // No more pension payments
+            }
         }
         spaargeldData.push(spaargeldTotPensioen.toFixed(0));
     }
@@ -211,6 +225,28 @@ function berekenPensioensparen() {
         dataTableBody.appendChild(row);
     });
 
+    // Add explanation
+    const explanation = `
+        <p><strong>Berekening van je Pensioenkapitaal:</strong></p>
+        <p>We gebruiken de volgende formule om het pensioenkapitaal te berekenen:</p>
+        <p>FV = P * (1 + r)^n + PMT * ((1 + r)^n - 1) / r</p>
+        <p>Waar:</p>
+        <ul>
+            <li>FV = Toekomstige waarde (pensioenkapitaal)</li>
+            <li>P = Initiële inleg (€${initieleInleg.toFixed(2)})</li>
+            <li>r = Jaarlijks rendement (${(jaarlijksRendement * 100).toFixed(2)}%)</li>
+            <li>n = Aantal jaren tot pensioen (${jarenTotPensioen})</li>
+            <li>PMT = Jaarlijkse bijdrage (€${bijdrage.toFixed(2)})</li>
+        </ul>
+        <p>Met deze gegevens komt het geschatte pensioenkapitaal op €${FV1.toFixed(2)}.</p>
+        <p><strong>Berekening van de Maandelijkse Uitkering:</strong></p>
+        <p>We gebruiken een iteratieve methode om de maandelijkse uitkering te berekenen, zodat het pensioenkapitaal ongeveer op is aan het einde van de verwachte levensduur. Hierbij houden we rekening met een rendement na pensioen van ${(rendementNaPensioen * 100).toFixed(2)}%.</p>
+        <p><strong>AOW Berekening:</strong></p>
+        <p>We starten met een basis AOW-bedrag van €13.200 per jaar. Dit bedrag groeit jaarlijks met ${(AOWGrowthRate * 100).toFixed(1)}% vanaf het huidige jaar tot aan en tijdens de pensioenperiode.</p>
+    `;
+
+    document.getElementById('calculation-details').innerHTML = explanation;
+
     // Call the new function to update the income chart
     calculateAndUpdateIncomeChart();
 }
@@ -222,6 +258,7 @@ function updateSliders() {
     document.getElementById('ageDisplay').textContent = parseFloat(document.getElementById('age').value).toFixed(0);
     document.getElementById('lifeExpectancyDisplay').textContent = parseFloat(document.getElementById('lifeExpectancy').value).toFixed(0);
     document.getElementById('incomeGrowthDisplay').textContent = `${parseFloat(document.getElementById('incomeGrowth').value).toFixed(0)}%`;
+    document.getElementById('aowGrowthDisplay').textContent = `${parseFloat(document.getElementById('aowGrowth').value).toFixed(1)}%`;
 }
 
 function toggleFrequency(button, type) {
@@ -303,22 +340,27 @@ function calculateAndUpdateIncomeChart() {
     const levensverwachting = parseFloat(document.getElementById('lifeExpectancy').value) || 90;
     const withdrawalEstimate = parseFloat(document.getElementById('estimatedWithdrawalDisplay').textContent.replace(/[^0-9.-]+/g,"")) || 0;
     const incomeGrowth = parseFloat(document.getElementById('incomeGrowth').value) / 100 || 0.02;
+    const AOWGrowthRate = parseFloat(document.getElementById('aowGrowth').value) / 100 || 0.01;
 
     // Get pension contribution from pensioensparen page
     const pensionContribution = parseFloat(document.getElementById('annualContribution').value) || 0;
     const pensionFrequency = document.getElementById('monthlyToggle').classList.contains('active') ? 'monthly' : 'annual';
 
     const AOWLeeftijd = 67; // Fixed AOW age
-    const AOWStartAmount = 13200; // Starting AOW amount
-    const AOWGrowthRate = 0.02; // 2% annual growth for AOW
+    const AOWStartAmount = 13200; // Starting AOW amount for the current year
 
-    const totalYears = levensverwachting - leeftijd;
+    const totalYears = levensverwachting - leeftijd + 5; // Extend 5 years beyond life expectancy
 
     let grossIncomeData = [];
     let netIncomeData = [];
     let aowData = [];
     let currentIncome = brutoInkomen;
     let currentAOW = AOWStartAmount;
+
+    // Calculate the future AOW amount at AOW age
+    for (let i = 0; i < AOWLeeftijd - leeftijd; i++) {
+        currentAOW *= (1 + AOWGrowthRate);
+    }
 
     const incomeDataTableBody = document.getElementById('incomeDataTable').querySelector('tbody');
     incomeDataTableBody.innerHTML = ''; // Clear existing rows
@@ -327,6 +369,7 @@ function calculateAndUpdateIncomeChart() {
         const currentAge = leeftijd + i;
         const isAOWAge = currentAge >= AOWLeeftijd;
         const isRetired = currentAge >= pensioenLeeftijd;
+        const isBeyondLifeExpectancy = currentAge > levensverwachting;
         
         if (!isRetired) {
             // Before retirement
@@ -337,41 +380,26 @@ function calculateAndUpdateIncomeChart() {
             aowData.push(0);
 
             // Add row to the table
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${currentAge}</td>
-                <td>€${formatNumber(currentIncome)}</td>
-                <td>€${formatNumber(netSalary)}</td>
-                <td>€0</td>
-            `;
-            incomeDataTableBody.appendChild(row);
+            addRowToIncomeTable(incomeDataTableBody, currentAge, currentIncome, netSalary, 0, isBeyondLifeExpectancy);
 
             // Apply income growth
             currentIncome *= (1 + incomeGrowth);
         } else {
             // After retirement
             const aowAmount = isAOWAge ? currentAOW : 0;
-            const grossIncomeWithAOW = withdrawalEstimate * 12 + aowAmount;
+            const currentPension = i < spaargeldData.length && parseFloat(spaargeldData[i]) > 0 ? withdrawalEstimate * 12 : 0;
+            const grossIncomeWithAOW = currentPension + aowAmount;
             grossIncomeData.push(grossIncomeWithAOW);
             const netSalary = calculateNetSalaryShared(grossIncomeWithAOW / 12, 0, currentAge).annualNetSalary;
             netIncomeData.push(netSalary);
             aowData.push(aowAmount);
 
             // Add row to the table
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${currentAge}</td>
-                <td>€${formatNumber(grossIncomeWithAOW)}</td>
-                <td>€${formatNumber(netSalary)}</td>
-                <td>€${formatNumber(aowAmount)}</td>
-            `;
-            incomeDataTableBody.appendChild(row);
-
-            // Apply AOW growth if applicable
-            if (isAOWAge) {
-                currentAOW *= (1 + AOWGrowthRate);
-            }
+            addRowToIncomeTable(incomeDataTableBody, currentAge, grossIncomeWithAOW, netSalary, aowAmount, isBeyondLifeExpectancy);
         }
+
+        // Apply AOW growth every year, regardless of whether it's being received yet
+        currentAOW *= (1 + AOWGrowthRate);
     }
 
     const labels = Array.from({ length: totalYears }, (_, i) => leeftijd + i);
@@ -390,6 +418,45 @@ function calculateAndUpdateIncomeChart() {
     });
 
     updateIncomeChart(labels, grossIncomeData, netIncomeData, aowData);
+
+    // Add explanation
+    const explanation = `
+        <p><strong>Berekening van het Inkomen:</strong></p>
+        <p>We berekenen het inkomen voor elk jaar vanaf de huidige leeftijd (${leeftijd}) tot 5 jaar na de verwachte levensduur (${levensverwachting + 5}).</p>
+        <ul>
+            <li><strong>Voor Pensioen (tot ${pensioenLeeftijd} jaar):</strong></li>
+            <ul>
+                <li>Bruto inkomen start op €${brutoInkomen.toFixed(2)} en groeit jaarlijks met ${(incomeGrowth * 100).toFixed(1)}%</li>
+                <li>Netto inkomen wordt berekend op basis van de huidige belastingregels</li>
+                <li>Pensioenbijdrage: €${pensionContribution.toFixed(2)} per ${pensionFrequency === 'monthly' ? 'maand' : 'jaar'}</li>
+            </ul>
+            <li><strong>Na Pensioen (vanaf ${pensioenLeeftijd} jaar):</strong></li>
+            <ul>
+                <li>Bruto inkomen bestaat uit pensioenuitkering (€${(withdrawalEstimate * 12).toFixed(2)} per jaar) plus AOW (indien van toepassing)</li>
+                <li>AOW start op €${AOWStartAmount.toFixed(2)} per jaar vanaf ${AOWLeeftijd} jaar en groeit jaarlijks met ${(AOWGrowthRate * 100).toFixed(1)}%</li>
+                <li>Netto inkomen wordt berekend op basis van de huidige belastingregels voor gepensioneerden</li>
+            </ul>
+        </ul>
+        <p><strong>Netto Inkomen Berekening:</strong></p>
+        <p>Het netto inkomen wordt berekend door de bruto-netto calculator te gebruiken, rekening houdend met de huidige belastingschijven, heffingskortingen, en sociale premies. Voor gepensioneerden worden aangepaste regels toegepast.</p>
+        <p><strong>Opmerking:</strong> Deze berekeningen zijn gebaseerd op de huidige belastingregels en kunnen in de toekomst veranderen.</p>
+    `;
+
+    document.getElementById('income-calculation-details').innerHTML = explanation;
+}
+
+function addRowToIncomeTable(tableBody, age, grossIncome, netIncome, aowAmount, isBeyondLifeExpectancy) {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+        <td>${age}</td>
+        <td>€${formatNumber(grossIncome)}</td>
+        <td>€${formatNumber(netIncome)}</td>
+        <td>€${formatNumber(aowAmount)}</td>
+    `;
+    if (isBeyondLifeExpectancy) {
+        row.style.opacity = 0.5;
+    }
+    tableBody.appendChild(row);
 }
 
 function calculate() {

@@ -692,6 +692,7 @@ button:hover {
 
 .estimated-withdrawal-container {
     margin: 1rem auto;
+    margin-top: -0.5rem;
     padding: 1rem;
     background-color: #f2f2f2;
     border-radius: 8px;
@@ -953,10 +954,10 @@ th, td {
 }
 
 .about-section {
-    margin-top: 50px;
-    padding: 30px;
-    background-color: #f0f0f0;
-    border-radius: 8px;
+    padding: 1rem;
+    border-radius: 10px;
+
+    
 }
 
 .about-section h2 {
@@ -968,6 +969,7 @@ th, td {
     font-size: 16px;
     line-height: 1.6;
     margin-bottom: 15px;
+    
 }
 
 
@@ -1012,8 +1014,7 @@ footer {
     display: flex;
     justify-content: space-between;
     gap: 30px;
-    margin-top: 40px;
-    margin-bottom: 40px;
+    margin: 1rem;
 }
 
 .calculator-option {
@@ -1210,10 +1211,58 @@ footer {
 }
 
 .table-collapsible-content.show {
-    max-height: 1000px; /* Adjust this value based on your content */
+    max-height: 3000px; /* Adjust this value based on your content */
     opacity: 1;
     padding: 20px;
 }
 
 
+.content h1, .content h2 {
+    color: #333;
+    margin-top: 20px;
+}
 
+.content p {
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.content ul {
+    margin-bottom: 15px;
+    padding-left: 20px;
+}
+
+.content li {
+    margin-bottom: 5px;
+}
+.content h1, .content h2 {
+    color: #333;
+    margin-top: 20px;
+}
+
+.content p {
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.content ul {
+    margin-bottom: 15px;
+    padding-left: 20px;
+}
+
+.content li {
+    margin-bottom: 5px;
+}
+
+.calculation-explanation h3 {
+    margin-top: 0;
+    color: #333;
+}
+
+.calculation-explanation p {
+    margin-bottom: 10px;
+}
+
+.calculation-explanation ul {
+    padding-left: 20px;
+}
