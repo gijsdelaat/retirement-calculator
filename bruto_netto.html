@@ -54,7 +54,24 @@
             </div>
             
             <div class="chart-container">
-                <p id="incomeSummary"></p>
+                <div class="income-summary-grid">
+                    <div class="summary-box" id="brutoBox">
+                        <h3>Bruto Inkomen</h3>
+                        <p id="brutoValue">€0</p>
+                    </div>
+                    <div class="summary-box" id="nettoBox">
+                        <h3>Netto Inkomen</h3>
+                        <p id="nettoValue">€0</p>
+                    </div>
+                    <div class="summary-box" id="belastingBox">
+                        <h3>Belasting</h3>
+                        <p id="belastingValue">€0</p>
+                    </div>
+                    <div class="summary-box" id="percentageBox">
+                        <h3>Effectief Belastingpercentage</h3>
+                        <p id="percentageValue">0%</p>
+                    </div>
+                </div>
                 <div class="table-and-chart" style="display: flex; justify-content: space-between;">
                     <div class="results-table" style="flex: 3; padding-right: 20px;">
                         <h2>Resultaat</h2>
@@ -63,8 +80,17 @@
                             <!-- Table content -->
                         </table>
                     </div>
-                    <div class="results-chart" style="flex: 1;">
+                    <div class="pie-chart-container" style="flex: 2;">
                         <canvas id="taxPieChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Add this new section -->
+                <button class="table-collapsible">Toelichting Berekeningen</button>
+                <div class="table-collapsible-content">
+                    <div id="calculation-explanation" class="calculation-explanation">
+                        <h3>Uitleg van de Berekeningen</h3>
+                        <p id="calculation-details"></p>
                     </div>
                 </div>
             </div>

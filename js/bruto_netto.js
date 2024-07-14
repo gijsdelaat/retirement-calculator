@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         updateSalaryInputLabel();
         calculate();
         attachEventListeners();
+        initializeCollapsible();
     }
 });
 
@@ -23,6 +24,54 @@ function attachEventListeners() {
     if (vacationMoneyInput) vacationMoneyInput.addEventListener('change', calculate);
     if (thirteenthMonthInput) thirteenthMonthInput.addEventListener('change', calculate);
     if (ageInput) ageInput.addEventListener('input', calculate);
+}
+
+function updateExplanation(salaries, displayFrequency) {
+    const explanationElement = document.getElementById('calculation-details');
+    if (!explanationElement) {
+        console.error('Explanation element not found');
+        return;
+    }
+
+    // Check if salaries object is undefined or doesn't have the expected properties
+    if (!salaries || typeof salaries !== 'object') {
+        console.error('Invalid salaries object passed to updateExplanation');
+        explanationElement.innerHTML = '<p>Er is een fout opgetreden bij het berekenen van de salarisgegevens.</p>';
+        return;
+    }
+
+    const factor = displayFrequency === 'monthly' ? 1 : 12;
+    const grossIncome = ((salaries.grossMonthlySalary || 0) || (salaries.grossAnnualSalary || 0) / 12) * factor;
+    const netIncome = ((salaries.monthlyNetSalary || 0) || (salaries.annualNetSalary || 0) / 12) * factor;
+    const taxAmount = ((salaries.effectiveTaxAmount || 0) / 12) * factor;
+    const effectiveTaxRate = grossIncome > 0 ? (taxAmount / grossIncome) * 100 : 0;
+
+    const explanation = `
+        <p><strong>Berekening van Bruto naar Netto Inkomen:</strong></p>
+        <p>We berekenen het netto inkomen op basis van het opgegeven bruto inkomen van €${grossIncome.toFixed(2)} per ${displayFrequency === 'monthly' ? 'maand' : 'jaar'}.</p>
+        <ul>
+            <li><strong>Bruto Inkomen:</strong> €${grossIncome.toFixed(2)}</li>
+            <li><strong>Belasting en Premies:</strong> €${taxAmount.toFixed(2)}</li>
+            <li><strong>Netto Inkomen:</strong> €${netIncome.toFixed(2)}</li>
+            <li><strong>Effectief Belastingpercentage:</strong> ${effectiveTaxRate.toFixed(2)}%</li>
+        </ul>
+        <p><strong>Toelichting op de Berekening:</strong></p>
+        <ul>
+            <li>De berekening houdt rekening met de huidige belastingschijven en tarieven.</li>
+            <li>Er wordt rekening gehouden met de algemene heffingskorting en de arbeidskorting.</li>
+            <li>Sociale premies zoals ZVW (Zorgverzekeringswet) zijn inbegrepen in de berekening.</li>
+            <li>Het effectieve belastingpercentage is het totaal aan belastingen en premies gedeeld door het bruto inkomen.</li>
+        </ul>
+        <p><strong>Opmerking:</strong> Deze berekening is een benadering en kan afwijken van de exacte bedragen. Voor een precieze berekening, raadpleeg een belastingadviseur of de Belastingdienst.</p>
+    `;
+
+    explanationElement.innerHTML = explanation;
+
+    // Refresh the collapsible content height if it's currently shown
+    const collapsibleContent = document.querySelector('.table-collapsible-content');
+    if (collapsibleContent && collapsibleContent.classList.contains('show')) {
+        collapsibleContent.style.maxHeight = collapsibleContent.scrollHeight + "px";
+    }
 }
 
 function toggleFrequency(button, type) {
@@ -99,6 +148,7 @@ function swapCalculation() {
 }
 
 function calculateNetSalary(monthlySalary, monthlyPensionContribution, age) {
+    console.log('Calculating net salary:', { monthlySalary, monthlyPensionContribution, age });
     // Adjust this function to work with monthly values
     const annualSalary = monthlySalary * 12;
     const annualPensionContribution = monthlyPensionContribution * 12;
@@ -127,7 +177,7 @@ function calculateNetSalary(monthlySalary, monthlyPensionContribution, age) {
     const netAnnualSalary = taxableIncome - effectiveTaxAmount;
     const netMonthlySalary = netAnnualSalary / 12;
 
-    return {
+    const salaries = {
         monthlyNetSalary: netMonthlySalary,
         annualNetSalary: netAnnualSalary,
         grossMonthlySalary: monthlySalary,
@@ -142,6 +192,8 @@ function calculateNetSalary(monthlySalary, monthlyPensionContribution, age) {
         ouderenkorting: ouderenkorting,
         annualPensionContribution: annualPensionContribution
     };
+    console.log('Calculated salaries:', salaries);
+    return salaries;
 }
 
 function calculateTax(grossAnnualSalary, age) {
@@ -285,9 +337,31 @@ function displayResults(salaries, displayFrequency) {
         tr.appendChild(valueCell);
         table.appendChild(tr);
     });
+    
+    const brutoIncome = salaries.grossAnnualSalary / 12 * factor;
+    const nettoIncome = salaries.annualNetSalary / 12 * factor;
+    const taxAmount = salaries.effectiveTaxAmount / 12 * factor;
+    const effectiveTaxRate = (taxAmount / brutoIncome) * 100;
+
+    updateSummaryBox('brutoValue', brutoIncome);
+    updateSummaryBox('nettoValue', nettoIncome);
+    updateSummaryBox('belastingValue', taxAmount);
+    updateSummaryBox('percentageValue', effectiveTaxRate, true);
+
 
     updateChart(salaries, displayFrequency);
-    updateSummary(); // Call this after updating the chart
+    updateSummary(brutoIncome, nettoIncome, taxAmount, effectiveTaxRate);
+}
+
+function updateSummaryBox(id, value, isPercentage = false) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.textContent = isPercentage 
+            ? `${value.toFixed(2)}%` 
+            : `€${formatNumber(value)}`;
+    } else {
+        console.warn(`Element with id '${id}' not found. Skipping update.`);
+    }
 }
 
 function formatCurrency(value) {
@@ -310,20 +384,31 @@ function updateChart(salaries, displayFrequency) {
 
 let grossIncome, netIncome, inkomstenbelasting, arbeidskorting, algemeneHeffingskorting, isMonthly;
 
-function updateResultsSummary() {
-    console.log(`Updating summary: Monthly=${isMonthly}, Gross Income=${grossIncome}, Net Income=${netIncome}`);
-    document.getElementById('results-summary').innerHTML = `
-        <div class="summary-header">
-            <h3>Samenvatting</h3>
-        </div>
-        <div class="summary-body">
-            <p><strong>${isMonthly ? 'Maandelijks' : 'Jaarlijks'} Bruto Inkomen:</strong> €${grossIncome.toFixed(2)}</p>
-            <p><strong>${isMonthly ? 'Maandelijks' : 'Jaarlijks'} Netto Inkomen:</strong> €${netIncome.toFixed(2)}</p>
-            <p><strong>Inkomstenbelasting:</strong> €${inkomstenbelasting.toFixed(2)}</p>
-            <p><strong>Arbeidskorting:</strong> €${arbeidskorting.toFixed(2)}</p>
-            <p><strong>Algemene Heffingskorting:</strong> €${algemeneHeffingskorting.toFixed(2)}</p>
-        </div>
-    `;
+function updateSummary(brutoIncome, nettoIncome, taxAmount, effectiveTaxRate) {
+    const incomeSummaryElement = document.getElementById('incomeSummary');
+    const taxSummaryElement = document.getElementById('taxSummary');
+
+    if (incomeSummaryElement) {
+        incomeSummaryElement.innerHTML = `
+        <div class="summary-item"><strong>Bruto inkomen:</strong> €${formatNumber(brutoIncome)}</div>
+        <div class="summary-item"><strong>Netto besteedbaar inkomen:</strong> €${formatNumber(nettoIncome)}</div>
+        <div class="summary-item"><strong>Belasting:</strong> €${formatNumber(taxAmount)}</div>
+        <div class="summary-item"><strong>Belastingdruk:</strong> ${effectiveTaxRate.toFixed(2)}% van uw inkomen</div>
+        `;
+
+        // Apply consistent styling
+        incomeSummaryElement.style.fontSize = '18px';
+        incomeSummaryElement.style.fontWeight = '600';
+    }
+
+    if (taxSummaryElement) {
+        taxSummaryElement.style.fontSize = '18px';
+        taxSummaryElement.style.fontWeight = '600';
+    }
+}
+
+function formatNumber(value) {
+    return value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 function calculate() {
@@ -340,8 +425,14 @@ function calculate() {
         salaries = calculateNetSalary(bruttoMonthlySalary, monthlyPensionContribution, age);
     }
 
-    displayResults(salaries, displayFrequency);
-    updateSummary();
+    if (salaries && typeof salaries === 'object') {
+        console.log('Calculated salaries:', salaries);
+        displayResults(salaries, displayFrequency);
+        updateSummary();
+        updateExplanation(salaries, displayFrequency);
+    } else {
+        console.error('Invalid salaries object in calculate function');
+    }
 }
 
 function toggleFrequency(button, type) {
@@ -439,38 +530,6 @@ function calculateBrutoFromNetto(netSalary) {
     return estimatedGrossMonthly;
 }
 
-function updateSummary() {
-    if (!taxPieChartInstance) return;
-
-    const data = taxPieChartInstance.data.datasets[0].data;
-    if (data.length < 2) return; // Ensure there's enough data
-
-    const netIncome = data[0]; // Net income is the first slice of the pie
-    const taxes = data[1]; // Taxes (effective loonheffing) is the second slice
-    const grossIncome = netIncome + taxes; // Gross income is the sum of net income and taxes
-
-    // Calculate tax burden as a percentage of gross income
-    const taxBurden = (taxes / grossIncome) * 100;
-
-    const incomeType = (calculationType === 'brutoToNetto') ? 'Bruto' : 'Netto';
-    const incomeValue = (calculationType === 'brutoToNetto') ? grossIncome : netIncome;
-    const incomeSummaryElement = document.getElementById('incomeSummary');
-    const taxSummaryElement = document.getElementById('taxSummary');
-
-    incomeSummaryElement.innerHTML = `
-    <div class="summary-item"><strong>Bruto inkomen:</strong> €${grossIncome.toFixed(2)}</div>
-    <div class="summary-item"><strong>Netto besteedbaar inkomen:</strong> €${netIncome.toFixed(2)}</div>
-    <div class="summary-item"><strong>Belasting:</strong> €${taxes.toFixed(2)}</div>
-    <div class="summary-item"><strong>Belastingdruk:</strong> ${taxBurden.toFixed(2)}% van uw inkomen</div>
-    `;
-
-    // Apply consistent styling
-    incomeSummaryElement.style.fontSize = '18px';
-    taxSummaryElement.style.fontSize = '18px';
-    incomeSummaryElement.style.fontWeight = '600';
-    taxSummaryElement.style.fontWeight = '600';
-}
-
 function updateSalaryInputLabel() {
     const salaryLabel = document.querySelector('label[for="salary"]');
     if (!salaryLabel) {
@@ -485,10 +544,37 @@ function updateSalaryInputLabel() {
     }
 }
 
+function initializeCollapsible() {
+    const collapsibleButton = document.querySelector('.table-collapsible');
+    const collapsibleContent = document.querySelector('.table-collapsible-content');
+    
+    if (collapsibleButton && collapsibleContent) {
+        collapsibleButton.addEventListener('click', function() {
+            this.classList.toggle('active');
+            collapsibleContent.classList.toggle('show');
+            if (collapsibleContent.classList.contains('show')) {
+                collapsibleContent.style.maxHeight = collapsibleContent.scrollHeight + "px";
+            } else {
+                collapsibleContent.style.maxHeight = null;
+            }
+        });
+
+        console.log('Collapsible initialized');
+    } else {
+        console.error('Collapsible button or content not found');
+    }
+}
+
 document.addEventListener('DOMContentLoaded', (event) => {
     console.log('DOM fully loaded and parsed');
-    updateSalaryInputLabel(); // Update bij het laden van de pagina
-    calculate(); // Voer een initiële berekening uit
+    if (document.getElementById('salary')) {
+        // We're on the bruto_netto page
+        initializeChart();
+        updateSalaryInputLabel();
+        calculate();
+        attachEventListeners();
+        initializeCollapsible();
+    }
 });
 
 function calculateBrutoNetto() {
