@@ -1311,6 +1311,7 @@ footer {
     padding-left: 20px;
 }
 
+
 .table-collapsible.active + .table-collapsible-content {
     max-height: 1000px; /* Adjust this value as needed */
 }
