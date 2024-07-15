@@ -1314,3 +1314,94 @@ footer {
 .table-collapsible.active + .table-collapsible-content {
     max-height: 1000px; /* Adjust this value as needed */
 }
+/* Add these new styles at the end of your existing CSS file */
+
+.index-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.index-calculator-options {
+    margin-bottom: 40px;
+}
+
+.index-calculator-options h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.index-options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.index-calculator-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease;
+    text-decoration: none;
+    text-align: center;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+}
+
+.index-calculator-card:hover {
+    transform: translateY(-5px);
+}
+
+.index-card-image {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+}
+
+.index-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.3s ease;
+}
+
+.index-card-image .animated {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+}
+
+.index-calculator-card:hover .index-card-image .static {
+    opacity: 0;
+}
+
+.index-calculator-card:hover .index-card-image .animated {
+    opacity: 1;
+}
+
+.index-card-content {
+    padding: 20px;
+    flex-grow: 1;
+}
+
+.index-card-content h2 {
+    margin-bottom: 10px;
+}
+
+.index-about-section {
+    background-color: #f8f9fa;
+    padding: 40px;
+    border-radius: 8px;
+    margin-top: 40px;
+}
+
+@media (max-width: 768px) {
+    .index-options-grid {
+        grid-template-columns: 1fr;
+    }
+}
+

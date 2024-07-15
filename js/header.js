@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <a href="mailto:gijsdelaat1993@gmail.com" class="contact-button">Contact</a>
     </div>
     <div class="mobile-menu-toggle">
-        <i class="fas fa-bars"></i>
+        <i class="fas fa-bars" style="font-size: 24px;"></i>
     </div>
     `;
     
